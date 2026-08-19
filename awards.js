@@ -75,9 +75,15 @@
   var enterHallBtn = document.getElementById("enterHallBtn");
 
   function populateCard(place, project) {
-    var track = trackByCode[project.track] || { color: "#37788A", name: "" };
-    document.getElementById("track-" + place).textContent = track.name;
-    document.getElementById("track-" + place).style.color = track.color;
+    var track = trackByCode[project.track] || null;
+    var trackEl = document.getElementById("track-" + place);
+    if (track && track.name) {
+      trackEl.textContent = track.name;
+      trackEl.style.color = track.color;
+      trackEl.hidden = false;
+    } else {
+      trackEl.hidden = true;
+    }
     document.getElementById("title-" + place).textContent = project.title;
     document.getElementById("students-" + place).textContent = project.students.join(", ");
     document.getElementById("blurb-" + place).textContent = project.blurb;

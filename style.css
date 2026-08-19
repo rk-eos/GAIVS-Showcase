@@ -83,89 +83,99 @@
 .search-wrap input::placeholder { color: var(--meta); }
 .search-wrap input:focus { border-color: var(--teal); }
 
-.track-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.track-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--card-bg);
-  border: 1px solid var(--hairline);
-  border-radius: 999px;
-  padding: 6px 13px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.03em;
-  color: var(--body-text);
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
-}
-.track-chip__dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-.track-chip.is-active {
-  color: #fff;
-  background: var(--gold);
-  border-color: var(--gold);
-}
-.track-chip.is-active .track-chip__dot { background: #fff !important; }
-.track-chip:hover:not(.is-active) { border-color: var(--gold); }
+.hall-header--compact { padding: 32px 5vw 20px; }
 
 /* ---------------------------------------------------------------------------
-   HALL / LEGEND / MAP
+   3D HALLWAY
 --------------------------------------------------------------------------- */
-.hall { padding: 28px 5vw 80px; max-width: 1400px; margin: 0 auto; }
+.hallway-wrap {
+  position: relative;
+  height: calc(100vh - 190px);
+  min-height: 460px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 5vw 24px;
+}
 
-.hall__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  margin-bottom: 18px;
+#hallwayCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: var(--radius-md);
+  cursor: grab;
+  touch-action: none;
+}
+
+.hallway-hint {
+  position: absolute;
+  top: 16px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 7px 16px;
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--body-text);
+  box-shadow: 0 4px 14px rgba(38,51,59,0.08);
+  transition: opacity 0.4s ease;
+  pointer-events: none;
 }
-.hall__legend span.dot { width: 9px; height: 9px; display: inline-block; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.hallway-hint.is-hidden { opacity: 0; }
 
-.floorplan-wrap {
+.hallway-progress-wrap {
+  position: absolute;
+  left: 5vw; right: 5vw; bottom: 66px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hallway-progress-label { font-family: var(--font-mono); font-size: 11px; color: var(--meta); white-space: nowrap; }
+
+.walk-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--hairline);
+  outline: none;
+}
+.walk-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--gold);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(38,51,59,0.25);
+  cursor: pointer;
+}
+.walk-slider::-moz-range-thumb {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--gold);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(38,51,59,0.25);
+  cursor: pointer;
+}
+
+.hallway-controls {
+  position: absolute;
+  left: 50%; bottom: 16px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.walk-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
   border: 1px solid var(--hairline);
-  border-radius: var(--radius-md);
-  padding: 24px 16px 12px;
   background: var(--card-bg);
-  box-shadow: 0 2px 10px rgba(38,51,59,0.04);
-  overflow-x: auto;
+  color: var(--ink);
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(38,51,59,0.08);
 }
-
-#floorplan { width: 100%; min-width: 720px; height: auto; display: block; }
-
-.entrance rect { fill: var(--gold); }
-.entrance-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; fill: var(--gold-hover); }
-
-.aisle-label {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.booth-group { cursor: pointer; }
-.booth-group rect.booth-body {
-  stroke-width: 1.5;
-  transition: filter 0.15s ease, stroke-width 0.15s ease, opacity 0.2s ease;
-}
-.booth-group:hover rect.booth-body,
-.booth-group.is-focused rect.booth-body {
-  filter: brightness(0.96);
-  stroke-width: 2.4;
-}
-.booth-group text.booth-id { font-family: var(--font-mono); font-weight: 500; font-size: 15px; }
-.booth-group text.booth-title { font-family: var(--font-body); font-size: 11px; fill: var(--ink); opacity: 0.75; }
-.booth-group.is-dimmed { opacity: 0.22; }
-.booth-group.is-dimmed:hover rect.booth-body { filter: none; stroke-width: 1.5; }
-
-.floorplan-hint { font-family: var(--font-mono); font-size: 11px; color: var(--meta); text-align: center; margin: 10px 0 0; }
+.walk-btn:hover { border-color: var(--teal); color: var(--teal); }
+.hallway-counter { font-family: var(--font-mono); font-size: 12px; color: var(--body-text); min-width: 150px; text-align: center; }
 
 /* ---------------------------------------------------------------------------
    OVERLAY + PANEL
@@ -241,4 +251,7 @@
   .search-wrap input { width: 100%; max-width: none; }
   .panel { width: 100vw; }
   .squiggle { display: none; }
+  .hallway-wrap { height: calc(100vh - 260px); padding: 0 4vw 20px; }
+  .hallway-progress-wrap { left: 4vw; right: 4vw; bottom: 58px; }
+  .hallway-progress-label { display: none; }
 }

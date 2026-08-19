@@ -1,49 +1,35 @@
 // ---------------------------------------------------------------------------
 // PROJECT DATA
-// Replace these placeholder entries with your real projects.
-// Keep the `id` format (TRACK-NUMBER) if you want the booth numbering on the
-// map to stay meaningful — the letter is the aisle/track, the number is the
-// booth position within that aisle.
+// Replace these placeholder entries with your real 20 projects.
+// Categories/tracks aren't decided yet, so booths are just numbered 01-20
+// for now. Once tracks exist, a "track" field can be added back and used
+// to color-code booths in the hallway again.
 //
 // videoSrc / deckSrc should point at files you drop into:
-//   assets/videos/   (e.g. a01.mp4)
-//   assets/decks/    (e.g. a01.pdf)
+//   assets/videos/   (e.g. 01.mp4)
+//   assets/decks/    (e.g. 01.pdf)
 // See assets/README.md for exact naming + format notes.
 // ---------------------------------------------------------------------------
 
-const TRACKS = [
-  { code: "A", name: "Data & AI",                     color: "#37788A", tint: "#E9F1F1" },
-  { code: "B", name: "Health & Bio",                  color: "#DFA63E", tint: "#FAF2E1" },
-  { code: "C", name: "Sustainability & Environment",  color: "#8E2E4D", tint: "#F7EBEF" },
-  { code: "D", name: "Design, Media & Society",       color: "#5F6B72", tint: "#F1F2F3" },
-];
-
 const PROJECTS = [
-  // ---- Aisle A: Data & AI ----
-  { id: "A-01", track: "A", row: 1, col: 1, title: "Placeholder Project A1", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here — what problem it tackles and the approach taken.", videoSrc: "assets/videos/a01.mp4", deckSrc: "assets/decks/a01.pdf" },
-  { id: "A-02", track: "A", row: 1, col: 2, title: "Placeholder Project A2", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/a02.mp4", deckSrc: "assets/decks/a02.pdf" },
-  { id: "A-03", track: "A", row: 1, col: 3, title: "Placeholder Project A3", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/a03.mp4", deckSrc: "assets/decks/a03.pdf" },
-  { id: "A-04", track: "A", row: 1, col: 4, title: "Placeholder Project A4", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/a04.mp4", deckSrc: "assets/decks/a04.pdf" },
-  { id: "A-05", track: "A", row: 1, col: 5, title: "Placeholder Project A5", students: ["Student Name", "Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/a05.mp4", deckSrc: "assets/decks/a05.pdf" },
-
-  // ---- Aisle B: Health & Bio ----
-  { id: "B-01", track: "B", row: 2, col: 1, title: "Placeholder Project B1", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/b01.mp4", deckSrc: "assets/decks/b01.pdf" },
-  { id: "B-02", track: "B", row: 2, col: 2, title: "Placeholder Project B2", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/b02.mp4", deckSrc: "assets/decks/b02.pdf" },
-  { id: "B-03", track: "B", row: 2, col: 3, title: "Placeholder Project B3", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/b03.mp4", deckSrc: "assets/decks/b03.pdf" },
-  { id: "B-04", track: "B", row: 2, col: 4, title: "Placeholder Project B4", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/b04.mp4", deckSrc: "assets/decks/b04.pdf" },
-  { id: "B-05", track: "B", row: 2, col: 5, title: "Placeholder Project B5", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/b05.mp4", deckSrc: "assets/decks/b05.pdf" },
-
-  // ---- Aisle C: Sustainability & Environment ----
-  { id: "C-01", track: "C", row: 3, col: 1, title: "Placeholder Project C1", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/c01.mp4", deckSrc: "assets/decks/c01.pdf" },
-  { id: "C-02", track: "C", row: 3, col: 2, title: "Placeholder Project C2", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/c02.mp4", deckSrc: "assets/decks/c02.pdf" },
-  { id: "C-03", track: "C", row: 3, col: 3, title: "Placeholder Project C3", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/c03.mp4", deckSrc: "assets/decks/c03.pdf" },
-  { id: "C-04", track: "C", row: 3, col: 4, title: "Placeholder Project C4", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/c04.mp4", deckSrc: "assets/decks/c04.pdf" },
-  { id: "C-05", track: "C", row: 3, col: 5, title: "Placeholder Project C5", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/c05.mp4", deckSrc: "assets/decks/c05.pdf" },
-
-  // ---- Aisle D: Design, Media & Society ----
-  { id: "D-01", track: "D", row: 4, col: 1, title: "Placeholder Project D1", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/d01.mp4", deckSrc: "assets/decks/d01.pdf" },
-  { id: "D-02", track: "D", row: 4, col: 2, title: "Placeholder Project D2", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/d02.mp4", deckSrc: "assets/decks/d02.pdf" },
-  { id: "D-03", track: "D", row: 4, col: 3, title: "Placeholder Project D3", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/d03.mp4", deckSrc: "assets/decks/d03.pdf" },
-  { id: "D-04", track: "D", row: 4, col: 4, title: "Placeholder Project D4", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/d04.mp4", deckSrc: "assets/decks/d04.pdf" },
-  { id: "D-05", track: "D", row: 4, col: 5, title: "Placeholder Project D5", students: ["Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/d05.mp4", deckSrc: "assets/decks/d05.pdf" },
+  { id: "01", title: "Placeholder Project 1", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/01.mp4", deckSrc: "assets/decks/01.pdf" },
+  { id: "02", title: "Placeholder Project 2", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/02.mp4", deckSrc: "assets/decks/02.pdf" },
+  { id: "03", title: "Placeholder Project 3", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/03.mp4", deckSrc: "assets/decks/03.pdf" },
+  { id: "04", title: "Placeholder Project 4", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/04.mp4", deckSrc: "assets/decks/04.pdf" },
+  { id: "05", title: "Placeholder Project 5", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/05.mp4", deckSrc: "assets/decks/05.pdf" },
+  { id: "06", title: "Placeholder Project 6", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/06.mp4", deckSrc: "assets/decks/06.pdf" },
+  { id: "07", title: "Placeholder Project 7", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/07.mp4", deckSrc: "assets/decks/07.pdf" },
+  { id: "08", title: "Placeholder Project 8", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/08.mp4", deckSrc: "assets/decks/08.pdf" },
+  { id: "09", title: "Placeholder Project 9", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/09.mp4", deckSrc: "assets/decks/09.pdf" },
+  { id: "10", title: "Placeholder Project 10", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/10.mp4", deckSrc: "assets/decks/10.pdf" },
+  { id: "11", title: "Placeholder Project 11", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/11.mp4", deckSrc: "assets/decks/11.pdf" },
+  { id: "12", title: "Placeholder Project 12", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/12.mp4", deckSrc: "assets/decks/12.pdf" },
+  { id: "13", title: "Placeholder Project 13", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/13.mp4", deckSrc: "assets/decks/13.pdf" },
+  { id: "14", title: "Placeholder Project 14", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/14.mp4", deckSrc: "assets/decks/14.pdf" },
+  { id: "15", title: "Placeholder Project 15", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/15.mp4", deckSrc: "assets/decks/15.pdf" },
+  { id: "16", title: "Placeholder Project 16", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/16.mp4", deckSrc: "assets/decks/16.pdf" },
+  { id: "17", title: "Placeholder Project 17", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/17.mp4", deckSrc: "assets/decks/17.pdf" },
+  { id: "18", title: "Placeholder Project 18", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/18.mp4", deckSrc: "assets/decks/18.pdf" },
+  { id: "19", title: "Placeholder Project 19", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/19.mp4", deckSrc: "assets/decks/19.pdf" },
+  { id: "20", title: "Placeholder Project 20", students: ["Student Name", "Student Name"], blurb: "One or two sentence summary of the project goes here.", videoSrc: "assets/videos/20.mp4", deckSrc: "assets/decks/20.pdf" },
 ];

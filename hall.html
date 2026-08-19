@@ -11,54 +11,52 @@
 </head>
 <body>
 
-<header class="hall-header">
-  <svg class="squiggle squiggle--left" viewBox="0 0 160 60" aria-hidden="true"><path d="M2 40 C 30 5, 55 5, 80 30 S 130 55, 158 20" fill="none"/></svg>
-  <svg class="squiggle squiggle--right" viewBox="0 0 160 60" aria-hidden="true"><path d="M2 20 C 30 55, 55 55, 80 30 S 130 5, 158 40" fill="none"/></svg>
+<header class="hall-header hall-header--compact">
   <div class="hall-header__title">
-    <a href="index.html" class="back-link">← Back to results</a>
-    <p class="eyebrow">Global AI Venture Studio · Final Showcase</p>
+    <a href="index.html" class="back-link">&larr; Back to results</a>
+    <p class="eyebrow">Global AI Venture Studio &middot; Final Showcase</p>
     <h1>Project <span class="brand-teal">Showcase</span></h1>
-    <p class="subtitle">20 student ventures, one floor. Click any booth to watch the pitch and read the deck.</p>
+    <p class="subtitle">Walk the hall. Click any booth to watch the pitch and read the deck.</p>
   </div>
-
   <div class="hall-header__controls">
     <div class="search-wrap">
-      <input id="searchInput" type="text" placeholder="Find a project or student…" aria-label="Search projects">
+      <input id="searchInput" type="text" placeholder="Find a project, then press Enter&hellip;" aria-label="Search projects, press Enter to walk to the match">
     </div>
-    <div class="track-filters" id="trackFilters" role="group" aria-label="Filter by track"></div>
   </div>
 </header>
 
-<main class="hall">
-  <div class="hall__legend" id="legend"></div>
+<main class="hallway-wrap">
+  <canvas id="hallwayCanvas" aria-label="3D walkthrough of exhibition booths"></canvas>
 
-  <div class="floorplan-wrap">
-    <svg id="floorplan" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Interactive floor plan of exhibition booths">
-      <!-- entrance -->
-      <g class="entrance">
-        <rect x="440" y="590" width="120" height="14" rx="2"></rect>
-        <text x="500" y="612" text-anchor="middle" class="entrance-label">ENTRANCE</text>
-      </g>
-      <!-- booths + aisle labels injected by script.js -->
-      <g id="boothLayer"></g>
-    </svg>
-    <p class="floorplan-hint">Tap a booth to open the project. Use arrow keys to browse once one is open.</p>
+  <div class="hallway-hint" id="hallwayHint">
+    Scroll, drag the bar below, or use &larr; &rarr; to walk &middot; click a booth to open it
+  </div>
+
+  <div class="hallway-progress-wrap">
+    <span class="hallway-progress-label">Entrance</span>
+    <input id="walkSlider" class="walk-slider" type="range" min="0" max="1000" value="0" aria-label="Position in the hallway">
+    <span class="hallway-progress-label">End of hall</span>
+  </div>
+
+  <div class="hallway-controls">
+    <button id="walkBack" class="walk-btn" aria-label="Walk backward">&larr;</button>
+    <span id="boothCounter" class="hallway-counter">Entrance</span>
+    <button id="walkForward" class="walk-btn" aria-label="Walk forward">&rarr;</button>
   </div>
 </main>
 
 <!-- Detail panel -->
 <div id="overlay" class="overlay" hidden></div>
 <aside id="panel" class="panel" hidden aria-hidden="true" aria-label="Project details">
-  <button id="panelClose" class="panel__close" aria-label="Close project details">✕</button>
+  <button id="panelClose" class="panel__close" aria-label="Close project details">&#10005;</button>
 
   <div class="panel__nav">
-    <button id="panelPrev" class="panel__nav-btn" aria-label="Previous booth">‹ Prev</button>
+    <button id="panelPrev" class="panel__nav-btn" aria-label="Previous booth">&lsaquo; Prev</button>
     <span id="panelBoothId" class="panel__booth-id"></span>
-    <button id="panelNext" class="panel__nav-btn" aria-label="Next booth">Next ›</button>
+    <button id="panelNext" class="panel__nav-btn" aria-label="Next booth">Next &rsaquo;</button>
   </div>
 
   <div class="panel__body">
-    <p class="panel__track" id="panelTrack"></p>
     <h2 id="panelTitle"></h2>
     <p class="panel__students" id="panelStudents"></p>
     <p class="panel__blurb" id="panelBlurb"></p>
@@ -72,13 +70,14 @@
       <h3 class="panel__media-label">Pitch deck</h3>
       <div class="media-frame media-frame--deck">
         <iframe id="panelDeck" title="Pitch deck viewer"></iframe>
-        <a id="panelDeckFallback" class="deck-fallback-link" target="_blank" rel="noopener">Open deck in new tab ↗</a>
+        <a id="panelDeckFallback" class="deck-fallback-link" target="_blank" rel="noopener">Open deck in new tab &#8599;</a>
       </div>
     </div>
   </div>
 </aside>
 
 <script src="data/projects.js"></script>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
