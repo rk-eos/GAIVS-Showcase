@@ -107,57 +107,128 @@
   }
   window.addEventListener("resize", resize);
 
-  // lights
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xddd8cc, 1.0));
-  for (var lz = START_Z - 4; lz > END_Z + 4; lz -= 13) {
-    var pl = new THREE.PointLight(0xffeac2, 0.9, 16);
-    pl.position.set(0, 3.6, lz);
+  // atmosphere: soft vertical gradient sky instead of flat clear color
+  var skyCanvas = document.createElement("canvas");
+  skyCanvas.width = 8; skyCanvas.height = 256;
+  var skyCtx = skyCanvas.getContext("2d");
+  var skyGrad = skyCtx.createLinearGradient(0, 0, 0, 256);
+  skyGrad.addColorStop(0, "#F3E7D0");
+  skyGrad.addColorStop(1, "#FBFAF7");
+  skyCtx.fillStyle = skyGrad;
+  skyCtx.fillRect(0, 0, 8, 256);
+  scene.background = new THREE.CanvasTexture(skyCanvas);
+
+  // lights — ambient + warm hemisphere + a run of gallery downlights
+  scene.add(new THREE.AmbientLight(0xffffff, 1.3));
+  scene.add(new THREE.HemisphereLight(0xfff3e0, 0xd9cdb2, 1.4));
+  for (var lz = START_Z - 4; lz > END_Z + 4; lz -= 11) {
+    var pl = new THREE.PointLight(0xffe9c2, 22, 15, 2);
+    pl.position.set(0, 3.7, lz);
     scene.add(pl);
   }
 
-  // floor
+  var WALL_H = 3.6, CEIL_Y = 3.6;
+
+  // floor: warm base + a teal runway stripe down the center
   var floorGeo = new THREE.PlaneGeometry(12, HALLWAY_LEN);
-  var floorMat = new THREE.MeshStandardMaterial({ color: 0xf4f5f6, roughness: 0.95 });
+  var floorMat = new THREE.MeshStandardMaterial({ color: 0xf6f2e9, roughness: 0.95 });
   var floor = new THREE.Mesh(floorGeo, floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(0, 0, HALLWAY_CENTER_Z);
   scene.add(floor);
 
-  var grid = new THREE.GridHelper(Math.max(12, HALLWAY_LEN), Math.round(HALLWAY_LEN / 2), 0xecece2, 0xecece2);
-  grid.position.set(0, 0.01, HALLWAY_CENTER_Z);
+  var runway = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.5, HALLWAY_LEN),
+    new THREE.MeshStandardMaterial({ color: 0x37788a, roughness: 0.85 })
+  );
+  runway.rotation.x = -Math.PI / 2;
+  runway.position.set(0, 0.008, HALLWAY_CENTER_Z);
+  scene.add(runway);
+
+  var grid = new THREE.GridHelper(Math.max(12, HALLWAY_LEN), Math.round(HALLWAY_LEN / 2), 0xe3ddcb, 0xe3ddcb);
+  grid.position.set(0, 0.012, HALLWAY_CENTER_Z);
+  grid.material.transparent = true;
+  grid.material.opacity = 0.5;
   scene.add(grid);
 
-  // walls
-  var wallMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
+  // ceiling with recessed light strips
+  var ceiling = new THREE.Mesh(
+    new THREE.PlaneGeometry(12, HALLWAY_LEN),
+    new THREE.MeshStandardMaterial({ color: 0xfaf6ee, roughness: 1 })
+  );
+  ceiling.rotation.x = Math.PI / 2;
+  ceiling.position.set(0, CEIL_Y, HALLWAY_CENTER_Z);
+  scene.add(ceiling);
+
+  for (var fz = START_Z - 3; fz > END_Z + 3; fz -= 6) {
+    var fixture = new THREE.Mesh(
+      new THREE.BoxGeometry(0.7, 0.05, 1.6),
+      new THREE.MeshStandardMaterial({ color: 0xfff6df, emissive: 0xffe9b8, emissiveIntensity: 1.4 })
+    );
+    fixture.position.set(0, CEIL_Y - 0.03, fz);
+    scene.add(fixture);
+  }
+
+  // walls with a teal baseboard and a gold datum line
+  var wallMat = new THREE.MeshStandardMaterial({ color: 0xfdfbf5, roughness: 0.92 });
+  var baseboardMat = new THREE.MeshStandardMaterial({ color: 0x2c6473, roughness: 0.8 });
+  var trimMat = new THREE.MeshStandardMaterial({ color: 0xdfa63e, roughness: 0.5, emissive: 0x8a611f, emissiveIntensity: 0.25 });
   [-5, 5].forEach(function (x) {
-    var wall = new THREE.Mesh(new THREE.BoxGeometry(0.2, 4.4, HALLWAY_LEN), wallMat);
-    wall.position.set(x, 2.2, HALLWAY_CENTER_Z);
+    var wall = new THREE.Mesh(new THREE.BoxGeometry(0.2, WALL_H, HALLWAY_LEN), wallMat);
+    wall.position.set(x, WALL_H / 2, HALLWAY_CENTER_Z);
     scene.add(wall);
+
+    var baseboard = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.34, HALLWAY_LEN), baseboardMat);
+    baseboard.position.set(x, 0.17, HALLWAY_CENTER_Z);
+    scene.add(baseboard);
+
+    var trim = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.05, HALLWAY_LEN), trimMat);
+    trim.position.set(x, 2.5, HALLWAY_CENTER_Z);
+    scene.add(trim);
   });
 
-  // booths
+  // booths — museum-plinth style: cream base + colored accent top, with a soft ground shadow
   var clickableMeshes = [];
   PROJECTS.forEach(function (project, index) {
     var pos = boothPosition(index);
     var color = ACCENT_COLORS[index % ACCENT_COLORS.length];
 
-    var material = new THREE.MeshStandardMaterial({
-      color: color, roughness: 0.7, emissive: 0x000000, emissiveIntensity: 0,
+    var shadowBlob = new THREE.Mesh(
+      new THREE.CircleGeometry(0.95, 24),
+      new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.16 })
+    );
+    shadowBlob.rotation.x = -Math.PI / 2;
+    shadowBlob.position.set(pos.x, 0.015, pos.z);
+    scene.add(shadowBlob);
+
+    var baseMat = new THREE.MeshStandardMaterial({ color: 0xf4f0e6, roughness: 0.85 });
+    var base = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.85, 1.0), baseMat);
+    base.position.set(pos.x, 0.425, pos.z);
+    base.userData.projectIndex = index;
+    base.userData.restEmissive = 0x000000;
+    base.userData.restIntensity = 0;
+    scene.add(base);
+    clickableMeshes.push(base);
+
+    var topMat = new THREE.MeshStandardMaterial({
+      color: color, roughness: 0.65, emissive: color, emissiveIntensity: 0.12,
     });
-    var kiosk = new THREE.Mesh(new THREE.BoxGeometry(1.7, 2.0, 0.9), material);
-    kiosk.position.set(pos.x, 1.0, pos.z);
-    kiosk.userData.projectIndex = index;
-    scene.add(kiosk);
-    clickableMeshes.push(kiosk);
+    var top = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.95, 0.82), topMat);
+    top.position.set(pos.x, 0.425 + 0.475 + 0.4, pos.z);
+    top.userData.projectIndex = index;
+    top.userData.restEmissive = color;
+    top.userData.restIntensity = 0.12;
+    scene.add(top);
+    clickableMeshes.push(top);
 
     var texture = makeLabelTexture(project.id, project.title);
     var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
     var sprite = new THREE.Sprite(spriteMat);
     sprite.scale.set(1.9, 0.95, 1);
-    sprite.position.set(pos.x, 2.75, pos.z);
+    sprite.position.set(pos.x, 2.15, pos.z);
     scene.add(sprite);
 
-    project.__mesh = kiosk;
+    project.__meshes = [base, top];
     project.__z = pos.z;
   });
 
@@ -236,14 +307,16 @@
       var pairZ = match.__z;
       var progress = (pairZ - START_Z) / (END_Z - START_Z);
       setProgress(progress);
-      flashBooth(match.__mesh);
+      flashBooth(match.__meshes);
       hint.classList.add("is-hidden");
     }
   });
 
-  function flashBooth(mesh) {
-    mesh.material.emissive.setHex(0xdfa63e);
-    mesh.userData.flash = 1.4;
+  function flashBooth(meshes) {
+    meshes.forEach(function (mesh) {
+      mesh.material.emissive.setHex(0xdfa63e);
+      mesh.userData.flash = 1.4;
+    });
   }
 
   // ===========================================================================
@@ -267,7 +340,11 @@
       if (m.userData.flash > 0) {
         m.userData.flash *= 0.92;
         m.material.emissiveIntensity = m.userData.flash;
-        if (m.userData.flash < 0.02) { m.userData.flash = 0; m.material.emissiveIntensity = 0; }
+        if (m.userData.flash < 0.02) {
+          m.userData.flash = 0;
+          m.material.emissive.setHex(m.userData.restEmissive || 0x000000);
+          m.material.emissiveIntensity = m.userData.restIntensity || 0;
+        }
       }
     });
 
