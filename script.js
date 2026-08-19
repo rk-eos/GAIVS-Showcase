@@ -134,7 +134,7 @@
   renderer.setClearColor(0xfbfaf7, 1);
 
   var scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xfbfaf7, 22, Math.abs(END_WALL_Z) + 20);
+  scene.fog = new THREE.Fog(0x141b2e, 20, Math.abs(END_WALL_Z) + 16);
 
   var camera = new THREE.PerspectiveCamera(62, 1, 0.1, 200);
   var EYE_HEIGHT = 1.6;
@@ -149,28 +149,39 @@
   }
   window.addEventListener("resize", resize);
 
-  // atmosphere: soft vertical gradient sky instead of flat clear color
+  // atmosphere: night sky with stars, visible through the glass roof panels
   var skyCanvas = document.createElement("canvas");
-  skyCanvas.width = 8; skyCanvas.height = 256;
+  skyCanvas.width = 256; skyCanvas.height = 256;
   var skyCtx = skyCanvas.getContext("2d");
   var skyGrad = skyCtx.createLinearGradient(0, 0, 0, 256);
-  skyGrad.addColorStop(0, "#6FB3D9");
-  skyGrad.addColorStop(0.55, "#B7DCEC");
-  skyGrad.addColorStop(1, "#F3E7D0");
+  skyGrad.addColorStop(0, "#050912");
+  skyGrad.addColorStop(0.55, "#101B33");
+  skyGrad.addColorStop(1, "#26314A");
   skyCtx.fillStyle = skyGrad;
-  skyCtx.fillRect(0, 0, 8, 256);
+  skyCtx.fillRect(0, 0, 256, 256);
+  for (var si = 0; si < 220; si++) {
+    var sx = Math.random() * 256;
+    var sy = Math.random() * 256 * 0.75; // keep stars mostly in the upper sky
+    var sr = Math.random() * 1.1 + 0.2;
+    skyCtx.globalAlpha = Math.random() * 0.7 + 0.3;
+    skyCtx.fillStyle = "#ffffff";
+    skyCtx.beginPath();
+    skyCtx.arc(sx, sy, sr, 0, Math.PI * 2);
+    skyCtx.fill();
+  }
+  skyCtx.globalAlpha = 1;
   scene.background = new THREE.CanvasTexture(skyCanvas);
 
-  // lights — ambient + warm hemisphere + a run of gallery downlights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-  scene.add(new THREE.HemisphereLight(0xfff3e0, 0xd9cdb2, 0.95));
-  var sun = new THREE.DirectionalLight(0xfff6e0, 1.1);
-  sun.position.set(4, 20, START_Z - 10);
-  sun.target.position.set(0, 0, START_Z - 30);
-  scene.add(sun);
-  scene.add(sun.target);
+  // lights — dim cool moonlight fill; the warm interior fixtures do the actual work
+  scene.add(new THREE.AmbientLight(0xaabbdd, 0.35));
+  scene.add(new THREE.HemisphereLight(0x2a3550, 0x2a2216, 0.4));
+  var moon = new THREE.DirectionalLight(0xaac4e6, 0.35);
+  moon.position.set(4, 20, START_Z - 10);
+  moon.target.position.set(0, 0, START_Z - 30);
+  scene.add(moon);
+  scene.add(moon.target);
   for (var lz = START_Z - 4; lz > END_Z + 4; lz -= 11) {
-    var pl = new THREE.PointLight(0xffe9c2, 45, 24, 2);
+    var pl = new THREE.PointLight(0xffe9c2, 65, 26, 2);
     pl.position.set(0, 6.5, lz);
     scene.add(pl);
   }
@@ -250,7 +261,7 @@
 
     var pendant = new THREE.Mesh(
       new THREE.SphereGeometry(0.24, 16, 12),
-      toonMaterial(0xfff6df, { emissive: 0xffe0a0, emissiveIntensity: 1.6 })
+      toonMaterial(0xfff6df, { emissive: 0xffe0a0, emissiveIntensity: 2.1 })
     );
     pendant.position.set(0, PENDANT_Y, fz);
     addOutline(pendant, 1.1);
@@ -274,7 +285,7 @@
   // walls with a teal baseboard and a gold datum line
   var wallMat = toonMaterial(0xfdfbf5);
   var baseboardMat = toonMaterial(0x2c6473);
-  var trimMat = toonMaterial(0xdfa63e, { emissive: 0x8a611f, emissiveIntensity: 0.25 });
+  var trimMat = toonMaterial(0xdfa63e, { emissive: 0x8a611f, emissiveIntensity: 0.4 });
   [-WALL_X, WALL_X].forEach(function (x) {
     var wall = new THREE.Mesh(new THREE.BoxGeometry(0.2, WALL_H, HALLWAY_LEN), wallMat);
     wall.position.set(x, WALL_H / 2, HALLWAY_CENTER_Z);
