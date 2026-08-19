@@ -86,6 +86,44 @@
   }
 
   // ===========================================================================
+  // CEL SHADING HELPERS
+  // ===========================================================================
+  function makeToonGradient() {
+    var c = document.createElement("canvas");
+    c.width = 4; c.height = 1;
+    var ctx = c.getContext("2d");
+    var shades = [70, 140, 200, 255];
+    shades.forEach(function (v, i) {
+      ctx.fillStyle = "rgb(" + v + "," + v + "," + v + ")";
+      ctx.fillRect(i, 0, 1, 1);
+    });
+    var tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.NearestFilter;
+    tex.magFilter = THREE.NearestFilter;
+    return tex;
+  }
+  var toonGradient = makeToonGradient();
+
+  function toonMaterial(color, opts) {
+    opts = opts || {};
+    var mat = new THREE.MeshToonMaterial({
+      color: color, gradientMap: toonGradient,
+      emissive: opts.emissive !== undefined ? opts.emissive : 0x000000,
+      emissiveIntensity: opts.emissiveIntensity || 0,
+    });
+    return mat;
+  }
+
+  // adds a black inverted-hull outline around a mesh (Borderlands-style)
+  function addOutline(mesh, scale) {
+    var outlineMat = new THREE.MeshBasicMaterial({ color: 0x1c1a16, side: THREE.BackSide });
+    var outline = new THREE.Mesh(mesh.geometry, outlineMat);
+    outline.scale.multiplyScalar(scale || 1.06);
+    mesh.add(outline);
+    return outline;
+  }
+
+  // ===========================================================================
   // SCENE SETUP
   // ===========================================================================
   var canvas = document.getElementById("hallwayCanvas");
@@ -124,15 +162,15 @@
   scene.add(new THREE.AmbientLight(0xffffff, 1.3));
   scene.add(new THREE.HemisphereLight(0xfff3e0, 0xd9cdb2, 1.4));
   for (var lz = START_Z - 4; lz > END_Z + 4; lz -= 11) {
-    var pl = new THREE.PointLight(0xffe9c2, 22, 15, 2);
-    pl.position.set(0, 3.7, lz);
+    var pl = new THREE.PointLight(0xffe9c2, 45, 24, 2);
+    pl.position.set(0, 6.5, lz);
     scene.add(pl);
   }
 
-  var WALL_H = 3.6, CEIL_Y = 3.6;
+  var WALL_H = 9, CEIL_Y = 9, WALL_X = 7.5;
 
   // floor: warm base + a teal runway stripe down the center
-  var floorGeo = new THREE.PlaneGeometry(12, HALLWAY_LEN);
+  var floorGeo = new THREE.PlaneGeometry(WALL_X * 2 + 2, HALLWAY_LEN);
   var floorMat = new THREE.MeshStandardMaterial({ color: 0xf6f2e9, roughness: 0.95 });
   var floor = new THREE.Mesh(floorGeo, floorMat);
   floor.rotation.x = -Math.PI / 2;
@@ -147,34 +185,47 @@
   runway.position.set(0, 0.008, HALLWAY_CENTER_Z);
   scene.add(runway);
 
-  var grid = new THREE.GridHelper(Math.max(12, HALLWAY_LEN), Math.round(HALLWAY_LEN / 2), 0xe3ddcb, 0xe3ddcb);
+  var grid = new THREE.GridHelper(Math.max(WALL_X * 2, HALLWAY_LEN), Math.round(HALLWAY_LEN / 2), 0xe3ddcb, 0xe3ddcb);
   grid.position.set(0, 0.012, HALLWAY_CENTER_Z);
   grid.material.transparent = true;
   grid.material.opacity = 0.5;
   scene.add(grid);
 
-  // ceiling with recessed light strips
+  // high warehouse ceiling with exposed roof trusses
   var ceiling = new THREE.Mesh(
-    new THREE.PlaneGeometry(12, HALLWAY_LEN),
-    new THREE.MeshStandardMaterial({ color: 0xfaf6ee, roughness: 1 })
+    new THREE.PlaneGeometry(WALL_X * 2 + 2, HALLWAY_LEN),
+    new THREE.MeshStandardMaterial({ color: 0xece4d3, roughness: 1 })
   );
   ceiling.rotation.x = Math.PI / 2;
   ceiling.position.set(0, CEIL_Y, HALLWAY_CENTER_Z);
   scene.add(ceiling);
 
+  var trussMat = new THREE.MeshStandardMaterial({ color: 0x8f8577, roughness: 0.7, metalness: 0.3 });
+  for (var tz = START_Z - 2; tz > END_Z; tz -= 8) {
+    var beam = new THREE.Mesh(new THREE.BoxGeometry(WALL_X * 2, 0.28, 0.28), trussMat);
+    beam.position.set(0, CEIL_Y - 0.35, tz);
+    scene.add(beam);
+    [-1, 1].forEach(function (dz) {
+      var brace = new THREE.Mesh(new THREE.BoxGeometry(WALL_X * 2, 0.5, 0.12), trussMat);
+      brace.rotation.z = dz * 0.35;
+      brace.position.set(0, CEIL_Y - 0.9, tz + dz * 0.9);
+      scene.add(brace);
+    });
+  }
+
   for (var fz = START_Z - 3; fz > END_Z + 3; fz -= 6) {
     var rod = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.02, 0.02, 0.5, 8),
-      new THREE.MeshStandardMaterial({ color: 0x8a7a5a })
+      new THREE.CylinderGeometry(0.02, 0.02, 3.4, 8),
+      new THREE.MeshStandardMaterial({ color: 0x6b6255 })
     );
-    rod.position.set(0, CEIL_Y - 0.28, fz);
+    rod.position.set(0, CEIL_Y - 2.0, fz);
     scene.add(rod);
 
     var pendant = new THREE.Mesh(
-      new THREE.SphereGeometry(0.22, 16, 12),
+      new THREE.SphereGeometry(0.24, 16, 12),
       new THREE.MeshStandardMaterial({ color: 0xfff6df, emissive: 0xffe0a0, emissiveIntensity: 1.6, roughness: 0.4 })
     );
-    pendant.position.set(0, CEIL_Y - 0.56, fz);
+    pendant.position.set(0, CEIL_Y - 3.7, fz);
     scene.add(pendant);
   }
 
@@ -184,12 +235,10 @@
   for (var pz = START_Z - PAIR_SPACING / 2; pz > END_Z; pz -= PAIR_SPACING) {
     var pillarColor = pillarColors[pillarIdx % pillarColors.length];
     pillarIdx++;
-    [-5, 5].forEach(function (x) {
-      var pillar = new THREE.Mesh(
-        new THREE.BoxGeometry(0.16, WALL_H, 0.5),
-        new THREE.MeshStandardMaterial({ color: pillarColor, roughness: 0.6 })
-      );
-      pillar.position.set(x + (x < 0 ? 0.09 : -0.09), WALL_H / 2, pz);
+    [-WALL_X, WALL_X].forEach(function (x) {
+      var pillar = new THREE.Mesh(new THREE.BoxGeometry(0.3, WALL_H, 0.6), toonMaterial(pillarColor));
+      pillar.position.set(x + (x < 0 ? 0.15 : -0.15), WALL_H / 2, pz);
+      addOutline(pillar, 1.04);
       scene.add(pillar);
     });
   }
@@ -198,7 +247,7 @@
   var wallMat = new THREE.MeshStandardMaterial({ color: 0xfdfbf5, roughness: 0.92 });
   var baseboardMat = new THREE.MeshStandardMaterial({ color: 0x2c6473, roughness: 0.8 });
   var trimMat = new THREE.MeshStandardMaterial({ color: 0xdfa63e, roughness: 0.5, emissive: 0x8a611f, emissiveIntensity: 0.25 });
-  [-5, 5].forEach(function (x) {
+  [-WALL_X, WALL_X].forEach(function (x) {
     var wall = new THREE.Mesh(new THREE.BoxGeometry(0.2, WALL_H, HALLWAY_LEN), wallMat);
     wall.position.set(x, WALL_H / 2, HALLWAY_CENTER_Z);
     scene.add(wall);
@@ -214,7 +263,7 @@
 
   // end wall — a visible terminus instead of an infinite foggy vanishing point
   var endWall = new THREE.Mesh(
-    new THREE.BoxGeometry(10.2, WALL_H, 0.3),
+    new THREE.BoxGeometry(WALL_X * 2 + 0.2, WALL_H, 0.3),
     new THREE.MeshStandardMaterial({ color: 0xfdfbf5, roughness: 0.9 })
   );
   endWall.position.set(0, WALL_H / 2, END_WALL_Z - 1);
@@ -245,6 +294,7 @@
 
   // booths — museum-plinth style: cream base + colored accent top, with a soft ground shadow
   var clickableMeshes = [];
+  var floatingSprites = [];
   PROJECTS.forEach(function (project, index) {
     var pos = boothPosition(index);
     var color = ACCENT_COLORS[index % ACCENT_COLORS.length];
@@ -257,23 +307,23 @@
     shadowBlob.position.set(pos.x, 0.015, pos.z);
     scene.add(shadowBlob);
 
-    var baseMat = new THREE.MeshStandardMaterial({ color: 0xf4f0e6, roughness: 0.85 });
+    var baseMat = toonMaterial(0xf4f0e6);
     var base = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.85, 1.0), baseMat);
     base.position.set(pos.x, 0.425, pos.z);
     base.userData.projectIndex = index;
     base.userData.restEmissive = 0x000000;
     base.userData.restIntensity = 0;
+    addOutline(base, 1.05);
     scene.add(base);
     clickableMeshes.push(base);
 
-    var topMat = new THREE.MeshStandardMaterial({
-      color: color, roughness: 0.65, emissive: color, emissiveIntensity: 0.12,
-    });
+    var topMat = toonMaterial(color, { emissive: color, emissiveIntensity: 0.12 });
     var top = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.95, 0.82), topMat);
     top.position.set(pos.x, 0.425 + 0.475 + 0.4, pos.z);
     top.userData.projectIndex = index;
     top.userData.restEmissive = color;
     top.userData.restIntensity = 0.12;
+    addOutline(top, 1.06);
     scene.add(top);
     clickableMeshes.push(top);
 
@@ -281,8 +331,11 @@
     var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
     var sprite = new THREE.Sprite(spriteMat);
     sprite.scale.set(1.9, 0.95, 1);
-    sprite.position.set(pos.x, 2.15, pos.z);
+    sprite.position.set(pos.x, 2.5, pos.z);
+    sprite.userData.baseY = 2.5;
+    sprite.userData.phase = index * 0.65;
     scene.add(sprite);
+    floatingSprites.push(sprite);
 
     project.__meshes = [base, top];
     project.__z = pos.z;
@@ -402,6 +455,11 @@
           m.material.emissiveIntensity = m.userData.restIntensity || 0;
         }
       }
+    });
+
+    var t = performance.now() * 0.0016;
+    floatingSprites.forEach(function (s) {
+      s.position.y = s.userData.baseY + Math.sin(t + s.userData.phase) * 0.14;
     });
 
     renderer.render(scene, camera);
