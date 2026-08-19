@@ -110,6 +110,8 @@
       color: color, gradientMap: toonGradient,
       emissive: opts.emissive !== undefined ? opts.emissive : 0x000000,
       emissiveIntensity: opts.emissiveIntensity || 0,
+      map: opts.map || null,
+      side: opts.side !== undefined ? opts.side : THREE.FrontSide,
     });
     return mat;
   }
@@ -159,28 +161,31 @@
   scene.background = new THREE.CanvasTexture(skyCanvas);
 
   // lights — ambient + warm hemisphere + a run of gallery downlights
-  scene.add(new THREE.AmbientLight(0xffffff, 1.3));
-  scene.add(new THREE.HemisphereLight(0xfff3e0, 0xd9cdb2, 1.4));
+  scene.add(new THREE.AmbientLight(0xffffff, 1.1));
+  scene.add(new THREE.HemisphereLight(0xfff3e0, 0xd9cdb2, 1.2));
+  var sun = new THREE.DirectionalLight(0xfff6e0, 1.6);
+  sun.position.set(4, 20, START_Z - 10);
+  sun.target.position.set(0, 0, START_Z - 30);
+  scene.add(sun);
+  scene.add(sun.target);
   for (var lz = START_Z - 4; lz > END_Z + 4; lz -= 11) {
     var pl = new THREE.PointLight(0xffe9c2, 45, 24, 2);
     pl.position.set(0, 6.5, lz);
     scene.add(pl);
   }
 
-  var WALL_H = 9, CEIL_Y = 9, WALL_X = 7.5;
+  var WALL_H = 9, WALL_X = 7.5;
+  var RIDGE_Y = WALL_H + 2.6;   // peak of the gabled roof
+  var PENDANT_Y = 5.3;          // fixed hang height regardless of roof shape
 
   // floor: warm base + a teal runway stripe down the center
   var floorGeo = new THREE.PlaneGeometry(WALL_X * 2 + 2, HALLWAY_LEN);
-  var floorMat = new THREE.MeshStandardMaterial({ color: 0xf6f2e9, roughness: 0.95 });
-  var floor = new THREE.Mesh(floorGeo, floorMat);
+  var floor = new THREE.Mesh(floorGeo, toonMaterial(0xf6f2e9));
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(0, 0, HALLWAY_CENTER_Z);
   scene.add(floor);
 
-  var runway = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.5, HALLWAY_LEN),
-    new THREE.MeshStandardMaterial({ color: 0x37788a, roughness: 0.85 })
-  );
+  var runway = new THREE.Mesh(new THREE.PlaneGeometry(1.5, HALLWAY_LEN), toonMaterial(0x37788a));
   runway.rotation.x = -Math.PI / 2;
   runway.position.set(0, 0.008, HALLWAY_CENTER_Z);
   scene.add(runway);
@@ -191,41 +196,67 @@
   grid.material.opacity = 0.5;
   scene.add(grid);
 
-  // high warehouse ceiling with exposed roof trusses
-  var ceiling = new THREE.Mesh(
-    new THREE.PlaneGeometry(WALL_X * 2 + 2, HALLWAY_LEN),
-    new THREE.MeshStandardMaterial({ color: 0xece4d3, roughness: 1 })
-  );
-  ceiling.rotation.x = Math.PI / 2;
-  ceiling.position.set(0, CEIL_Y, HALLWAY_CENTER_Z);
-  scene.add(ceiling);
+  // gabled roof — alternating solid + glass skylight bays so the sky shows through
+  var roofOpaqueMat = toonMaterial(0xece4d3, { side: THREE.DoubleSide });
+  var glassMat = new THREE.MeshBasicMaterial({ color: 0xdcebf0, transparent: true, opacity: 0.22, side: THREE.DoubleSide });
+  var BAY_LEN = 8;
+  var bayIdx = 0;
+  for (var bz = START_Z; bz > END_Z - BAY_LEN; bz -= BAY_LEN) {
+    var z0 = bz, z1 = bz - BAY_LEN;
+    var isGlass = bayIdx % 2 === 1;
+    bayIdx++;
+    [-1, 1].forEach(function (side) {
+      var outerX = side * WALL_X;
+      var geo = new THREE.BufferGeometry();
+      var verts = new Float32Array([
+        outerX, WALL_H, z0,   0, RIDGE_Y, z0,   outerX, WALL_H, z1,
+        outerX, WALL_H, z1,   0, RIDGE_Y, z0,   0, RIDGE_Y, z1,
+      ]);
+      geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+      geo.computeVertexNormals();
+      var mesh = new THREE.Mesh(geo, isGlass ? glassMat : roofOpaqueMat);
+      scene.add(mesh);
+    });
+  }
 
-  var trussMat = new THREE.MeshStandardMaterial({ color: 0x8f8577, roughness: 0.7, metalness: 0.3 });
+  // ridge cap beam along the peak, and eave beams where roof meets wall
+  var capMat = toonMaterial(0x8f8577);
+  var ridgeCap = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, HALLWAY_LEN), capMat);
+  ridgeCap.position.set(0, RIDGE_Y, HALLWAY_CENTER_Z);
+  addOutline(ridgeCap, 1.1);
+  scene.add(ridgeCap);
+
+  var trussMat = toonMaterial(0x8f8577);
   for (var tz = START_Z - 2; tz > END_Z; tz -= 8) {
     var beam = new THREE.Mesh(new THREE.BoxGeometry(WALL_X * 2, 0.28, 0.28), trussMat);
-    beam.position.set(0, CEIL_Y - 0.35, tz);
+    beam.position.set(0, WALL_H + 0.3, tz);
+    addOutline(beam, 1.08);
     scene.add(beam);
     [-1, 1].forEach(function (dz) {
       var brace = new THREE.Mesh(new THREE.BoxGeometry(WALL_X * 2, 0.5, 0.12), trussMat);
       brace.rotation.z = dz * 0.35;
-      brace.position.set(0, CEIL_Y - 0.9, tz + dz * 0.9);
+      brace.position.set(0, WALL_H - 0.25, tz + dz * 0.9);
+      addOutline(brace, 1.08);
       scene.add(brace);
     });
   }
 
   for (var fz = START_Z - 3; fz > END_Z + 3; fz -= 6) {
+    var rodTop = RIDGE_Y - 0.3;
+    var rodLen = rodTop - PENDANT_Y;
     var rod = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.02, 0.02, 3.4, 8),
-      new THREE.MeshStandardMaterial({ color: 0x6b6255 })
+      new THREE.CylinderGeometry(0.02, 0.02, rodLen, 8),
+      toonMaterial(0x6b6255)
     );
-    rod.position.set(0, CEIL_Y - 2.0, fz);
+    rod.position.set(0, (rodTop + PENDANT_Y) / 2, fz);
     scene.add(rod);
 
     var pendant = new THREE.Mesh(
       new THREE.SphereGeometry(0.24, 16, 12),
-      new THREE.MeshStandardMaterial({ color: 0xfff6df, emissive: 0xffe0a0, emissiveIntensity: 1.6, roughness: 0.4 })
+      toonMaterial(0xfff6df, { emissive: 0xffe0a0, emissiveIntensity: 1.6 })
     );
-    pendant.position.set(0, CEIL_Y - 3.7, fz);
+    pendant.position.set(0, PENDANT_Y, fz);
+    addOutline(pendant, 1.1);
     scene.add(pendant);
   }
 
@@ -244,9 +275,9 @@
   }
 
   // walls with a teal baseboard and a gold datum line
-  var wallMat = new THREE.MeshStandardMaterial({ color: 0xfdfbf5, roughness: 0.92 });
-  var baseboardMat = new THREE.MeshStandardMaterial({ color: 0x2c6473, roughness: 0.8 });
-  var trimMat = new THREE.MeshStandardMaterial({ color: 0xdfa63e, roughness: 0.5, emissive: 0x8a611f, emissiveIntensity: 0.25 });
+  var wallMat = toonMaterial(0xfdfbf5);
+  var baseboardMat = toonMaterial(0x2c6473);
+  var trimMat = toonMaterial(0xdfa63e, { emissive: 0x8a611f, emissiveIntensity: 0.25 });
   [-WALL_X, WALL_X].forEach(function (x) {
     var wall = new THREE.Mesh(new THREE.BoxGeometry(0.2, WALL_H, HALLWAY_LEN), wallMat);
     wall.position.set(x, WALL_H / 2, HALLWAY_CENTER_Z);
@@ -264,9 +295,10 @@
   // end wall — a visible terminus instead of an infinite foggy vanishing point
   var endWall = new THREE.Mesh(
     new THREE.BoxGeometry(WALL_X * 2 + 0.2, WALL_H, 0.3),
-    new THREE.MeshStandardMaterial({ color: 0xfdfbf5, roughness: 0.9 })
+    toonMaterial(0xfdfbf5)
   );
   endWall.position.set(0, WALL_H / 2, END_WALL_Z - 1);
+  addOutline(endWall, 1.02);
   scene.add(endWall);
 
   var bannerCanvas = document.createElement("canvas");
@@ -283,7 +315,7 @@
   var bannerTexture = new THREE.CanvasTexture(bannerCanvas);
   var banner = new THREE.Mesh(
     new THREE.PlaneGeometry(6, 2.25),
-    new THREE.MeshStandardMaterial({ map: bannerTexture, roughness: 0.6 })
+    toonMaterial(0xffffff, { map: bannerTexture })
   );
   banner.position.set(0, 1.9, END_WALL_Z - 0.83);
   scene.add(banner);
