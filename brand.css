@@ -28,7 +28,7 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; background: var(--page-bg); color: var(--ink); font-family: var(--font-body); min-height: 100%; }
+html, body { margin: 0; padding: 0; background: var(--page-bg); color: var(--ink); font-family: var(--font-body); min-height: 100%; overflow-x: hidden; }
 button { font-family: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .brand-teal { color: var(--teal); }

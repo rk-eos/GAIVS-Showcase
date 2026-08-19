@@ -351,14 +351,6 @@
   var bannerCanvas = document.createElement("canvas");
   bannerCanvas.width = 1024; bannerCanvas.height = 384;
   var bctx = bannerCanvas.getContext("2d");
-  bctx.fillStyle = "#37788A";
-  bctx.fillRect(0, 0, 1024, 384);
-  bctx.fillStyle = "#FBFAF7";
-  bctx.font = "800 84px 'Poppins', sans-serif";
-  bctx.textAlign = "center";
-  bctx.fillText("You've reached", 512, 165);
-  bctx.fillStyle = "#DFA63E";
-  bctx.fillText("the end of the hall", 512, 260);
   var bannerTexture = new THREE.CanvasTexture(bannerCanvas);
   var banner = new THREE.Mesh(
     new THREE.PlaneGeometry(6, 2.25),
@@ -366,6 +358,25 @@
   );
   banner.position.set(0, 1.9, END_WALL_Z - 0.83);
   scene.add(banner);
+
+  var logoImg = new Image();
+  logoImg.onload = function () {
+    bctx.fillStyle = "#FBFAF7";
+    bctx.fillRect(0, 0, 1024, 384);
+    var logoH = 150, logoW = logoH * (logoImg.width / logoImg.height);
+    bctx.drawImage(logoImg, (1024 - logoW) / 2, 26, logoW, logoH);
+
+    bctx.textAlign = "center";
+    bctx.fillStyle = "#26333B";
+    bctx.font = "800 62px 'Poppins', sans-serif";
+    bctx.fillText("GAIVS 2026", 512, 268);
+    bctx.fillStyle = "#DFA63E";
+    bctx.font = "700 34px 'Poppins', sans-serif";
+    bctx.fillText("STUDENT INVENTIONS", 512, 320);
+
+    bannerTexture.needsUpdate = true;
+  };
+  logoImg.src = "assets/img/gaivs-logo-full.png";
 
   var endGlow = new THREE.PointLight(0xffe9c2, 20, 12, 2);
   endGlow.position.set(0, 3, END_WALL_Z - 3);

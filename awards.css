@@ -16,6 +16,12 @@
   padding: 64px 5vw 60px;
 }
 
+.reveal__logo {
+  width: min(280px, 60vw);
+  height: auto;
+  margin-bottom: 22px;
+}
+
 .reveal .eyebrow {
   font-family: var(--font-mono);
   font-size: 12px;
