@@ -8,10 +8,12 @@
   var START_Z = 9;            // camera Z at the entrance (progress = 0)
   var PAIR_COUNT = Math.ceil(PROJECTS.length / 2);
   var LAST_PAIR_Z = -(10 + (PAIR_COUNT - 1) * PAIR_SPACING);
-  var END_Z = LAST_PAIR_Z - 10; // camera Z at the far end (progress = 1000)
+  var END_WALL_Z = LAST_PAIR_Z - 10;  // where the physical end wall sits
+  var END_Z = END_WALL_Z + 5;         // camera's max travel (progress = 1000) — stops short of the wall
+  var FAR_EDGE_Z = END_WALL_Z - 3;    // a little past the wall, for floor/ceiling/wall padding
   var SIDE_X = 3.2;
-  var HALLWAY_LEN = START_Z - END_Z + 20;
-  var HALLWAY_CENTER_Z = (START_Z + END_Z) / 2 - 5;
+  var HALLWAY_LEN = START_Z - FAR_EDGE_Z + 12;
+  var HALLWAY_CENTER_Z = (START_Z + FAR_EDGE_Z) / 2;
 
   var ACCENT_COLORS = [0x37788a, 0xdfa63e, 0x8e2e4d];
 
@@ -92,7 +94,7 @@
   renderer.setClearColor(0xfbfaf7, 1);
 
   var scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xfbfaf7, 18, 62);
+  scene.fog = new THREE.Fog(0xfbfaf7, 22, Math.abs(END_WALL_Z) + 20);
 
   var camera = new THREE.PerspectiveCamera(62, 1, 0.1, 200);
   var EYE_HEIGHT = 1.6;
@@ -161,12 +163,35 @@
   scene.add(ceiling);
 
   for (var fz = START_Z - 3; fz > END_Z + 3; fz -= 6) {
-    var fixture = new THREE.Mesh(
-      new THREE.BoxGeometry(0.7, 0.05, 1.6),
-      new THREE.MeshStandardMaterial({ color: 0xfff6df, emissive: 0xffe9b8, emissiveIntensity: 1.4 })
+    var rod = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.02, 0.02, 0.5, 8),
+      new THREE.MeshStandardMaterial({ color: 0x8a7a5a })
     );
-    fixture.position.set(0, CEIL_Y - 0.03, fz);
-    scene.add(fixture);
+    rod.position.set(0, CEIL_Y - 0.28, fz);
+    scene.add(rod);
+
+    var pendant = new THREE.Mesh(
+      new THREE.SphereGeometry(0.22, 16, 12),
+      new THREE.MeshStandardMaterial({ color: 0xfff6df, emissive: 0xffe0a0, emissiveIntensity: 1.6, roughness: 0.4 })
+    );
+    pendant.position.set(0, CEIL_Y - 0.56, fz);
+    scene.add(pendant);
+  }
+
+  // vertical accent pillars between booth pairs, alternating brand colors — breaks up repetition and doubles as wayfinding
+  var pillarColors = [0x37788a, 0xdfa63e, 0x8e2e4d];
+  var pillarIdx = 0;
+  for (var pz = START_Z - PAIR_SPACING / 2; pz > END_Z; pz -= PAIR_SPACING) {
+    var pillarColor = pillarColors[pillarIdx % pillarColors.length];
+    pillarIdx++;
+    [-5, 5].forEach(function (x) {
+      var pillar = new THREE.Mesh(
+        new THREE.BoxGeometry(0.16, WALL_H, 0.5),
+        new THREE.MeshStandardMaterial({ color: pillarColor, roughness: 0.6 })
+      );
+      pillar.position.set(x + (x < 0 ? 0.09 : -0.09), WALL_H / 2, pz);
+      scene.add(pillar);
+    });
   }
 
   // walls with a teal baseboard and a gold datum line
@@ -186,6 +211,37 @@
     trim.position.set(x, 2.5, HALLWAY_CENTER_Z);
     scene.add(trim);
   });
+
+  // end wall — a visible terminus instead of an infinite foggy vanishing point
+  var endWall = new THREE.Mesh(
+    new THREE.BoxGeometry(10.2, WALL_H, 0.3),
+    new THREE.MeshStandardMaterial({ color: 0xfdfbf5, roughness: 0.9 })
+  );
+  endWall.position.set(0, WALL_H / 2, END_WALL_Z - 1);
+  scene.add(endWall);
+
+  var bannerCanvas = document.createElement("canvas");
+  bannerCanvas.width = 1024; bannerCanvas.height = 384;
+  var bctx = bannerCanvas.getContext("2d");
+  bctx.fillStyle = "#37788A";
+  bctx.fillRect(0, 0, 1024, 384);
+  bctx.fillStyle = "#FBFAF7";
+  bctx.font = "800 84px 'Poppins', sans-serif";
+  bctx.textAlign = "center";
+  bctx.fillText("You've reached", 512, 165);
+  bctx.fillStyle = "#DFA63E";
+  bctx.fillText("the end of the hall", 512, 260);
+  var bannerTexture = new THREE.CanvasTexture(bannerCanvas);
+  var banner = new THREE.Mesh(
+    new THREE.PlaneGeometry(6, 2.25),
+    new THREE.MeshStandardMaterial({ map: bannerTexture, roughness: 0.6 })
+  );
+  banner.position.set(0, 1.9, END_WALL_Z - 0.83);
+  scene.add(banner);
+
+  var endGlow = new THREE.PointLight(0xffe9c2, 20, 12, 2);
+  endGlow.position.set(0, 3, END_WALL_Z - 3);
+  scene.add(endGlow);
 
   // booths — museum-plinth style: cream base + colored accent top, with a soft ground shadow
   var clickableMeshes = [];
