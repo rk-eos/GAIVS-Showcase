@@ -161,9 +161,9 @@
   scene.background = new THREE.CanvasTexture(skyCanvas);
 
   // lights — ambient + warm hemisphere + a run of gallery downlights
-  scene.add(new THREE.AmbientLight(0xffffff, 1.1));
-  scene.add(new THREE.HemisphereLight(0xfff3e0, 0xd9cdb2, 1.2));
-  var sun = new THREE.DirectionalLight(0xfff6e0, 1.6);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+  scene.add(new THREE.HemisphereLight(0xfff3e0, 0xd9cdb2, 0.95));
+  var sun = new THREE.DirectionalLight(0xfff6e0, 1.1);
   sun.position.set(4, 20, START_Z - 10);
   sun.target.position.set(0, 0, START_Z - 30);
   scene.add(sun);
@@ -232,13 +232,6 @@
     beam.position.set(0, WALL_H + 0.3, tz);
     addOutline(beam, 1.08);
     scene.add(beam);
-    [-1, 1].forEach(function (dz) {
-      var brace = new THREE.Mesh(new THREE.BoxGeometry(WALL_X * 2, 0.5, 0.12), trussMat);
-      brace.rotation.z = dz * 0.35;
-      brace.position.set(0, WALL_H - 0.25, tz + dz * 0.9);
-      addOutline(brace, 1.08);
-      scene.add(brace);
-    });
   }
 
   for (var fz = START_Z - 3; fz > END_Z + 3; fz -= 6) {
