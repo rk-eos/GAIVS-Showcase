@@ -104,6 +104,57 @@
   }
   var toonGradient = makeToonGradient();
 
+  function makeHardwoodTexture() {
+    var w = 128, h = 512;
+    var c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    var ctx = c.getContext("2d");
+    var plankW = 32; // 4 planks across the tile width
+    var seamRows = [0, h / 2]; // staggered end-joints, brick pattern
+    var tones = ["#B8875A", "#C6996B", "#AE7E4E", "#BD8F60"];
+
+    for (var col = 0; col < w / plankW; col++) {
+      var offsetRow = col % 2 === 0 ? 0 : h / 4; // stagger every other column
+      for (var seg = -1; seg < 3; seg++) {
+        var y0 = seg * (h / 2) + offsetRow;
+        var tone = tones[(col + seg + 4) % tones.length];
+        ctx.fillStyle = tone;
+        ctx.fillRect(col * plankW, y0, plankW, h / 2);
+
+        // subtle grain streaks
+        ctx.strokeStyle = "rgba(60,35,15,0.12)";
+        ctx.lineWidth = 1;
+        for (var g = 0; g < 5; g++) {
+          var gx = col * plankW + 3 + g * 6 + (Math.random() * 2 - 1);
+          ctx.beginPath();
+          ctx.moveTo(gx, y0);
+          ctx.lineTo(gx + (Math.random() * 4 - 2), y0 + h / 2);
+          ctx.stroke();
+        }
+
+        // end-joint seam line
+        ctx.strokeStyle = "rgba(40,24,10,0.35)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(col * plankW, y0);
+        ctx.lineTo(col * plankW + plankW, y0);
+        ctx.stroke();
+      }
+      // long seam between plank columns
+      ctx.strokeStyle = "rgba(40,24,10,0.4)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(col * plankW, 0);
+      ctx.lineTo(col * plankW, h);
+      ctx.stroke();
+    }
+
+    var tex = new THREE.CanvasTexture(c);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  }
+
   function toonMaterial(color, opts) {
     opts = opts || {};
     var mat = new THREE.MeshToonMaterial({
@@ -190,9 +241,14 @@
   var RIDGE_Y = WALL_H + 2.6;   // peak of the gabled roof
   var PENDANT_Y = 5.3;          // fixed hang height regardless of roof shape
 
-  // floor: warm base + a teal runway stripe down the center
+  // floor: hardwood planks + a teal runway rug down the center
   var floorGeo = new THREE.PlaneGeometry(WALL_X * 2 + 2, HALLWAY_LEN);
-  var floor = new THREE.Mesh(floorGeo, toonMaterial(0xf6f2e9));
+  var hardwoodTex = makeHardwoodTexture();
+  var TILE_W = 2, TILE_L = 4; // world units per texture tile
+  hardwoodTex.repeat.set((WALL_X * 2 + 2) / TILE_W, HALLWAY_LEN / TILE_L);
+  var maxAniso = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 1;
+  hardwoodTex.anisotropy = maxAniso;
+  var floor = new THREE.Mesh(floorGeo, toonMaterial(0xffffff, { map: hardwoodTex }));
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(0, 0, HALLWAY_CENTER_Z);
   scene.add(floor);
@@ -201,12 +257,6 @@
   runway.rotation.x = -Math.PI / 2;
   runway.position.set(0, 0.008, HALLWAY_CENTER_Z);
   scene.add(runway);
-
-  var grid = new THREE.GridHelper(Math.max(WALL_X * 2, HALLWAY_LEN), Math.round(HALLWAY_LEN / 2), 0xe3ddcb, 0xe3ddcb);
-  grid.position.set(0, 0.012, HALLWAY_CENTER_Z);
-  grid.material.transparent = true;
-  grid.material.opacity = 0.5;
-  scene.add(grid);
 
   // gabled roof — alternating solid + glass skylight bays so the sky shows through
   var roofOpaqueMat = toonMaterial(0xece4d3, { side: THREE.DoubleSide });
