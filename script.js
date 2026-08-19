@@ -154,8 +154,9 @@
   skyCanvas.width = 8; skyCanvas.height = 256;
   var skyCtx = skyCanvas.getContext("2d");
   var skyGrad = skyCtx.createLinearGradient(0, 0, 0, 256);
-  skyGrad.addColorStop(0, "#F3E7D0");
-  skyGrad.addColorStop(1, "#FBFAF7");
+  skyGrad.addColorStop(0, "#6FB3D9");
+  skyGrad.addColorStop(0.55, "#B7DCEC");
+  skyGrad.addColorStop(1, "#F3E7D0");
   skyCtx.fillStyle = skyGrad;
   skyCtx.fillRect(0, 0, 8, 256);
   scene.background = new THREE.CanvasTexture(skyCanvas);
@@ -198,7 +199,10 @@
 
   // gabled roof — alternating solid + glass skylight bays so the sky shows through
   var roofOpaqueMat = toonMaterial(0xece4d3, { side: THREE.DoubleSide });
-  var glassMat = new THREE.MeshBasicMaterial({ color: 0xdcebf0, transparent: true, opacity: 0.22, side: THREE.DoubleSide });
+  var glassMat = new THREE.MeshBasicMaterial({
+    color: 0xeaf6fb, transparent: true, opacity: 0.14, side: THREE.DoubleSide, depthWrite: false,
+  });
+  glassMat.fog = false;
   var BAY_LEN = 8;
   var bayIdx = 0;
   for (var bz = START_Z; bz > END_Z - BAY_LEN; bz -= BAY_LEN) {
