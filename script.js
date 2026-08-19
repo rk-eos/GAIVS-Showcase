@@ -254,15 +254,33 @@
   // gabled roof — alternating solid + glass skylight bays so the sky shows through
   var roofOpaqueMat = toonMaterial(0xece4d3, { side: THREE.DoubleSide });
   var glassMat = new THREE.MeshBasicMaterial({
-    color: 0xeaf6fb, transparent: true, opacity: 0.14, side: THREE.DoubleSide, depthWrite: false,
+    color: 0xeaf6fb, transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false,
   });
   glassMat.fog = false;
+  var mullionMat = toonMaterial(0x584f42);
+  var slopeDX = WALL_X, slopeDY = RIDGE_Y - WALL_H;
+  var slopeLen = Math.sqrt(slopeDX * slopeDX + slopeDY * slopeDY);
+  var slopeAngle = Math.atan2(slopeDY, slopeDX);
+
+  function addMullion(z) {
+    [-1, 1].forEach(function (side) {
+      var bar = new THREE.Mesh(new THREE.BoxGeometry(slopeLen, 0.08, 0.12), mullionMat);
+      bar.position.set(side * WALL_X / 2, (WALL_H + RIDGE_Y) / 2, z);
+      bar.rotation.z = side < 0 ? slopeAngle : Math.PI - slopeAngle;
+      addOutline(bar, 1.1);
+      scene.add(bar);
+    });
+  }
+
   var BAY_LEN = 8;
   var bayIdx = 0;
+  var lastZ1 = START_Z;
   for (var bz = START_Z; bz > END_Z - BAY_LEN; bz -= BAY_LEN) {
     var z0 = bz, z1 = bz - BAY_LEN;
     var isGlass = bayIdx % 2 === 1;
     bayIdx++;
+    addMullion(z0);
+    lastZ1 = z1;
     [-1, 1].forEach(function (side) {
       var outerX = side * WALL_X;
       var geo = new THREE.BufferGeometry();
@@ -276,6 +294,7 @@
       scene.add(mesh);
     });
   }
+  addMullion(lastZ1);
 
   // ridge cap beam along the peak, and eave beams where roof meets wall
   var capMat = toonMaterial(0x8f8577);
@@ -287,7 +306,7 @@
   var trussMat = toonMaterial(0x8f8577);
   for (var tz = START_Z - 2; tz > END_Z; tz -= 8) {
     var beam = new THREE.Mesh(new THREE.BoxGeometry(WALL_X * 2, 0.28, 0.28), trussMat);
-    beam.position.set(0, WALL_H + 0.3, tz);
+    beam.position.set(0, WALL_H - 0.25, tz);
     addOutline(beam, 1.08);
     scene.add(beam);
   }

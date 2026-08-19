@@ -1,6 +1,6 @@
 @import url("brand.css");
 
-body { overflow: hidden; height: 100vh; }
+body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
 .back-link {
   display: inline-block;
@@ -25,6 +25,7 @@ body { overflow: hidden; height: 100vh; }
   padding: 48px 5vw 28px;
   border-bottom: 1px solid var(--hairline);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .squiggle { position: absolute; width: 160px; height: 60px; opacity: 0.5; pointer-events: none; }
@@ -100,11 +101,13 @@ body { overflow: hidden; height: 100vh; }
 --------------------------------------------------------------------------- */
 .hallway-wrap {
   position: relative;
-  height: calc(100vh - 190px);
-  min-height: 460px;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 5vw 24px;
+  box-sizing: border-box;
 }
 
 #hallwayCanvas {
@@ -261,7 +264,7 @@ body { overflow: hidden; height: 100vh; }
   .search-wrap input { width: 100%; max-width: none; }
   .panel { width: 100vw; }
   .squiggle { display: none; }
-  .hallway-wrap { height: calc(100vh - 260px); padding: 0 4vw 20px; }
+  .hallway-wrap { padding: 0 4vw 20px; }
   .hallway-progress-wrap { left: 4vw; right: 4vw; bottom: 58px; }
   .hallway-progress-label { display: none; }
 }
