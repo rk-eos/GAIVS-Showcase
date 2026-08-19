@@ -1,0 +1,224 @@
+#particleBg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+}
+
+.reveal {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 5vw 60px;
+}
+
+.reveal .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-hover);
+  margin: 0 0 14px;
+}
+
+.reveal__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(34px, 6vw, 62px);
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.dots { color: var(--teal); }
+
+.reveal__subtitle {
+  font-family: var(--font-body);
+  color: var(--body-text);
+  font-size: 17px;
+  margin: 14px 0 48px;
+}
+
+/* ---------------------------------------------------------------------------
+   PODIUM
+--------------------------------------------------------------------------- */
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 980px;
+  margin-bottom: 44px;
+}
+
+.podium__slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 280px;
+  opacity: 0;
+  transform: translateY(24px);
+}
+.podium__slot--first { width: 320px; }
+
+.podium__card {
+  width: 100%;
+  min-height: 190px;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 24px rgba(38,51,59,0.08);
+  padding: 22px 20px;
+  margin-bottom: -1px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.podium__card--first { min-height: 220px; box-shadow: 0 10px 34px rgba(223,166,62,0.18); }
+
+.podium__locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--meta);
+}
+.podium__lock { font-size: 28px; filter: grayscale(1); opacity: 0.5; }
+.podium__rank-badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--meta);
+}
+
+.podium__revealed { width: 100%; text-align: left; }
+.podium__track {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+.podium__revealed h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.15;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+.podium__students {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--meta);
+  margin: 0 0 10px;
+}
+.podium__blurb {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--body-text);
+  margin: 0 0 14px;
+}
+.podium__watch-btn {
+  background: var(--tint-teal);
+  color: var(--teal-hover);
+  border: none;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+.podium__watch-btn:hover { background: var(--teal); color: #fff; }
+
+.podium__pedestal {
+  width: 90%;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  color: #fff;
+}
+.podium__pedestal--3 { height: 60px; background: var(--maroon); }
+.podium__pedestal--2 { height: 60px; background: var(--teal); }
+.podium__pedestal--1 { height: 96px; background: var(--gold); font-size: 34px; }
+
+/* ---------------------------------------------------------------------------
+   ACTION AREA
+--------------------------------------------------------------------------- */
+.reveal__action { min-height: 56px; display: flex; align-items: center; justify-content: center; }
+
+.reveal-btn {
+  display: inline-block;
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 15px 34px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(223,166,62,0.3);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.reveal-btn:hover { background: var(--gold-hover); transform: translateY(-1px); }
+.reveal-btn--ghost {
+  background: transparent;
+  color: var(--teal);
+  box-shadow: none;
+  border: 1.5px solid var(--teal);
+}
+.reveal-btn--ghost:hover { background: var(--tint-teal); }
+
+/* ---------------------------------------------------------------------------
+   WATCH MODAL
+--------------------------------------------------------------------------- */
+.watch-overlay { position: fixed; inset: 0; background: rgba(38,51,59,0.45); backdrop-filter: blur(2px); z-index: 90; }
+.watch-modal {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  width: min(640px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 60px rgba(38,51,59,0.3);
+  z-index: 91;
+  padding: 28px 26px;
+}
+.watch-modal__close {
+  position: absolute; top: 14px; right: 14px;
+  background: none; border: none; font-size: 16px; color: var(--body-text);
+  width: 34px; height: 34px; border-radius: 50%;
+}
+.watch-modal__close:hover { background: var(--surface); }
+.watch-modal__body h3 {
+  font-family: var(--font-display); font-weight: 800; font-size: 22px;
+  margin: 0 0 18px; padding-right: 30px; color: var(--ink);
+}
+.watch-media__frame { margin-bottom: 18px; }
+.watch-media__frame iframe {
+  width: 100%; border: 1px solid var(--hairline); border-radius: var(--radius-sm);
+  background: #000; display: block; aspect-ratio: 16/9;
+}
+.watch-media__frame--deck iframe { background: #fff; aspect-ratio: 16/10; }
+
+/* ---------------------------------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .podium { flex-direction: column; align-items: center; }
+  .podium__slot, .podium__slot--first { width: 100%; max-width: 360px; }
+  .podium__pedestal { display: none; }
+  .podium__slot--first { order: -1; }
+}

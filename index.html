@@ -3,81 +3,102 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Showcase Hall — Student Project Exhibition</title>
+<title>Results — Global AI Venture Studio Showcase</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="awards.css">
 </head>
 <body>
 
-<header class="hall-header">
-  <svg class="squiggle squiggle--left" viewBox="0 0 160 60" aria-hidden="true"><path d="M2 40 C 30 5, 55 5, 80 30 S 130 55, 158 20" fill="none"/></svg>
-  <svg class="squiggle squiggle--right" viewBox="0 0 160 60" aria-hidden="true"><path d="M2 20 C 30 55, 55 55, 80 30 S 130 5, 158 40" fill="none"/></svg>
-  <div class="hall-header__title">
-    <p class="eyebrow">Global AI Venture Studio · Final Showcase</p>
-    <h1>Project <span class="brand-teal">Showcase</span></h1>
-    <p class="subtitle">20 student ventures, one floor. Click any booth to watch the pitch and read the deck.</p>
-  </div>
+<canvas id="particleBg" aria-hidden="true"></canvas>
 
-  <div class="hall-header__controls">
-    <div class="search-wrap">
-      <input id="searchInput" type="text" placeholder="Find a project or student…" aria-label="Search projects">
+<main class="reveal">
+  <p class="eyebrow">Global AI Venture Studio · Final Results</p>
+  <h1 class="reveal__title">And the winners are<span class="dots">&hellip;</span></h1>
+  <p class="reveal__subtitle">20 ventures pitched. Three take the podium.</p>
+
+  <div class="podium" id="podium">
+    <div class="podium__slot" data-place="3" id="slot-3">
+      <div class="podium__card" id="card-3">
+        <div class="podium__locked">
+          <span class="podium__lock">&#128274;</span>
+          <span class="podium__rank-badge">3rd</span>
+        </div>
+        <div class="podium__revealed" hidden>
+          <p class="podium__track" id="track-3"></p>
+          <h2 id="title-3"></h2>
+          <p class="podium__students" id="students-3"></p>
+          <p class="podium__blurb" id="blurb-3"></p>
+          <button class="podium__watch-btn" data-place="3">&#9654; Watch pitch</button>
+        </div>
+      </div>
+      <div class="podium__pedestal podium__pedestal--3"><span>3</span></div>
     </div>
-    <div class="track-filters" id="trackFilters" role="group" aria-label="Filter by track"></div>
+
+    <div class="podium__slot podium__slot--first" data-place="1" id="slot-1">
+      <div class="podium__card podium__card--first" id="card-1">
+        <div class="podium__locked">
+          <span class="podium__lock">&#128274;</span>
+          <span class="podium__rank-badge">1st</span>
+        </div>
+        <div class="podium__revealed" hidden>
+          <p class="podium__track" id="track-1"></p>
+          <h2 id="title-1"></h2>
+          <p class="podium__students" id="students-1"></p>
+          <p class="podium__blurb" id="blurb-1"></p>
+          <button class="podium__watch-btn" data-place="1">&#9654; Watch pitch</button>
+        </div>
+      </div>
+      <div class="podium__pedestal podium__pedestal--1"><span>1</span></div>
+    </div>
+
+    <div class="podium__slot" data-place="2" id="slot-2">
+      <div class="podium__card" id="card-2">
+        <div class="podium__locked">
+          <span class="podium__lock">&#128274;</span>
+          <span class="podium__rank-badge">2nd</span>
+        </div>
+        <div class="podium__revealed" hidden>
+          <p class="podium__track" id="track-2"></p>
+          <h2 id="title-2"></h2>
+          <p class="podium__students" id="students-2"></p>
+          <p class="podium__blurb" id="blurb-2"></p>
+          <button class="podium__watch-btn" data-place="2">&#9654; Watch pitch</button>
+        </div>
+      </div>
+      <div class="podium__pedestal podium__pedestal--2"><span>2</span></div>
+    </div>
   </div>
-</header>
 
-<main class="hall">
-  <div class="hall__legend" id="legend"></div>
-
-  <div class="floorplan-wrap">
-    <svg id="floorplan" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Interactive floor plan of exhibition booths">
-      <!-- entrance -->
-      <g class="entrance">
-        <rect x="440" y="590" width="120" height="14" rx="2"></rect>
-        <text x="500" y="612" text-anchor="middle" class="entrance-label">ENTRANCE</text>
-      </g>
-      <!-- booths + aisle labels injected by script.js -->
-      <g id="boothLayer"></g>
-    </svg>
-    <p class="floorplan-hint">Tap a booth to open the project. Use arrow keys to browse once one is open.</p>
+  <div class="reveal__action">
+    <button id="revealBtn" class="reveal-btn">Reveal 3rd Place</button>
+    <a id="enterHallBtn" class="reveal-btn reveal-btn--ghost" href="hall.html" hidden>Explore all 20 projects &rarr;</a>
   </div>
 </main>
 
-<!-- Detail panel -->
-<div id="overlay" class="overlay" hidden></div>
-<aside id="panel" class="panel" hidden aria-hidden="true" aria-label="Project details">
-  <button id="panelClose" class="panel__close" aria-label="Close project details">✕</button>
-
-  <div class="panel__nav">
-    <button id="panelPrev" class="panel__nav-btn" aria-label="Previous booth">‹ Prev</button>
-    <span id="panelBoothId" class="panel__booth-id"></span>
-    <button id="panelNext" class="panel__nav-btn" aria-label="Next booth">Next ›</button>
-  </div>
-
-  <div class="panel__body">
-    <p class="panel__track" id="panelTrack"></p>
-    <h2 id="panelTitle"></h2>
-    <p class="panel__students" id="panelStudents"></p>
-    <p class="panel__blurb" id="panelBlurb"></p>
-
-    <div class="panel__media">
-      <h3 class="panel__media-label">Pitch video</h3>
-      <div class="media-frame media-frame--video">
-        <video id="panelVideo" controls preload="metadata"></video>
+<div id="watchOverlay" class="watch-overlay" hidden></div>
+<div id="watchModal" class="watch-modal" hidden aria-hidden="true">
+  <button id="watchClose" class="watch-modal__close" aria-label="Close">&#10005;</button>
+  <div class="watch-modal__body">
+    <h3 id="watchTitle"></h3>
+    <div class="watch-media">
+      <div class="watch-media__frame">
+        <iframe id="watchVideo" title="Pitch video" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
       </div>
-
-      <h3 class="panel__media-label">Pitch deck</h3>
-      <div class="media-frame media-frame--deck">
-        <iframe id="panelDeck" title="Pitch deck viewer"></iframe>
-        <a id="panelDeckFallback" class="deck-fallback-link" target="_blank" rel="noopener">Open deck in new tab ↗</a>
+      <div class="watch-media__frame watch-media__frame--deck">
+        <iframe id="watchDeck" title="Pitch deck"></iframe>
       </div>
     </div>
   </div>
-</aside>
+</div>
 
 <script src="data/projects.js"></script>
-<script src="script.js"></script>
+<script src="data/winners.js"></script>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script src="awards.js"></script>
 </body>
 </html>

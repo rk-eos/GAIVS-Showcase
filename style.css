@@ -1,53 +1,14 @@
-/* ---------------------------------------------------------------------------
-   TOKENS — Global AI Venture Studio brand
---------------------------------------------------------------------------- */
-:root {
-  --teal: #37788A;
-  --teal-hover: #2C6473;
-  --gold: #DFA63E;
-  --gold-hover: #C8912F;
-  --maroon: #8E2E4D;
+@import url("brand.css");
 
-  --page-bg: #FBFAF7;
-  --card-bg: #FFFFFF;
-  --surface: #F4F5F6;
-
-  --ink: #26333B;
-  --body-text: #5F6B72;
-  --meta: #8A949A;
-  --hairline: #ECECEC;
-
-  --tint-teal: #E9F1F1;
-  --tint-gold: #FAF2E1;
-  --tint-maroon: #F7EBEF;
-  --tint-neutral: #F1F2F3;
-
-  --font-display: "Poppins", sans-serif;
-  --font-body: "Source Serif 4", Georgia, serif;
-  --font-mono: "IBM Plex Mono", monospace;
-
-  --radius-sm: 6px;
-  --radius-md: 10px;
+.back-link {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--teal);
+  text-decoration: none;
+  margin-bottom: 10px;
 }
-
-* { box-sizing: border-box; }
-
-html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--page-bg);
-  color: var(--ink);
-  font-family: var(--font-body);
-  min-height: 100%;
-}
-
-button { font-family: inherit; cursor: pointer; }
-:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.brand-teal { color: var(--teal); }
-
-@media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
-}
+.back-link:hover { color: var(--teal-hover); }
 
 /* ---------------------------------------------------------------------------
    HEADER
