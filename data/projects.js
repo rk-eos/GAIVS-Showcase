@@ -12,10 +12,10 @@
 // ---------------------------------------------------------------------------
 
 const TRACKS = [
-  { code: "A", name: "Data & AI",              color: "#7FD1D9" },
-  { code: "B", name: "Health & Bio",           color: "#E8B04B" },
-  { code: "C", name: "Sustainability & Environment", color: "#8FD17F" },
-  { code: "D", name: "Design, Media & Society", color: "#E88FA0" },
+  { code: "A", name: "Data & AI",                     color: "#37788A", tint: "#E9F1F1" },
+  { code: "B", name: "Health & Bio",                  color: "#DFA63E", tint: "#FAF2E1" },
+  { code: "C", name: "Sustainability & Environment",  color: "#8E2E4D", tint: "#F7EBEF" },
+  { code: "D", name: "Design, Media & Society",       color: "#5F6B72", tint: "#F1F2F3" },
 ];
 
 const PROJECTS = [

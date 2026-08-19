@@ -123,7 +123,8 @@
       rect.setAttribute("y", y);
       rect.setAttribute("width", BOOTH_W);
       rect.setAttribute("height", BOOTH_H);
-      rect.setAttribute("rx", 3);
+      rect.setAttribute("rx", 8);
+      rect.setAttribute("fill", track.tint);
       rect.setAttribute("stroke", track.color);
       g.appendChild(rect);
 
