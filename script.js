@@ -185,7 +185,7 @@
   renderer.setClearColor(0xfbfaf7, 1);
 
   var scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x141b2e, 20, Math.abs(END_WALL_Z) + 16);
+  scene.fog = new THREE.Fog(0x0a0e18, 20, Math.abs(END_WALL_Z) + 16);
 
   var camera = new THREE.PerspectiveCamera(62, 1, 0.1, 200);
   var EYE_HEIGHT = 1.6;
@@ -200,28 +200,17 @@
   }
   window.addEventListener("resize", resize);
 
-  // atmosphere: night sky with stars, visible through the glass roof panels
-  var skyCanvas = document.createElement("canvas");
-  skyCanvas.width = 256; skyCanvas.height = 256;
-  var skyCtx = skyCanvas.getContext("2d");
-  var skyGrad = skyCtx.createLinearGradient(0, 0, 0, 256);
-  skyGrad.addColorStop(0, "#050912");
-  skyGrad.addColorStop(0.55, "#101B33");
-  skyGrad.addColorStop(1, "#26314A");
-  skyCtx.fillStyle = skyGrad;
-  skyCtx.fillRect(0, 0, 256, 256);
-  for (var si = 0; si < 220; si++) {
-    var sx = Math.random() * 256;
-    var sy = Math.random() * 256 * 0.75; // keep stars mostly in the upper sky
-    var sr = Math.random() * 1.1 + 0.2;
-    skyCtx.globalAlpha = Math.random() * 0.7 + 0.3;
-    skyCtx.fillStyle = "#ffffff";
-    skyCtx.beginPath();
-    skyCtx.arc(sx, sy, sr, 0, Math.PI * 2);
-    skyCtx.fill();
-  }
-  skyCtx.globalAlpha = 1;
-  scene.background = new THREE.CanvasTexture(skyCanvas);
+  // atmosphere: real night-sky photo, visible through the glass roof panels
+  var skyLoader = new THREE.TextureLoader();
+  skyLoader.load("assets/img/sky-nebula.jpg", function (tex) {
+    if ("colorSpace" in tex) tex.colorSpace = THREE.SRGBColorSpace;
+    tex.magFilter = THREE.LinearFilter;
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.generateMipmaps = true;
+    var maxAniso = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 1;
+    tex.anisotropy = maxAniso;
+    scene.background = tex;
+  });
 
   // lights — dim cool moonlight fill; the warm interior fixtures do the actual work
   scene.add(new THREE.AmbientLight(0xaabbdd, 0.35));
