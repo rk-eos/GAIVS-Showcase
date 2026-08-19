@@ -185,7 +185,7 @@
   renderer.setClearColor(0xfbfaf7, 1);
 
   var scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0a0e18, 20, Math.abs(END_WALL_Z) + 16);
+  scene.fog = new THREE.Fog(0x4a3450, 20, Math.abs(END_WALL_Z) + 16);
 
   var camera = new THREE.PerspectiveCamera(62, 1, 0.1, 200);
   var EYE_HEIGHT = 1.6;
@@ -200,26 +200,30 @@
   }
   window.addEventListener("resize", resize);
 
-  // atmosphere: real night-sky photo, visible through the glass roof panels
-  var skyLoader = new THREE.TextureLoader();
-  skyLoader.load("assets/img/sky-nebula.jpg", function (tex) {
-    if ("colorSpace" in tex) tex.colorSpace = THREE.SRGBColorSpace;
-    tex.magFilter = THREE.LinearFilter;
-    tex.minFilter = THREE.LinearMipmapLinearFilter;
-    tex.generateMipmaps = true;
-    var maxAniso = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 1;
-    tex.anisotropy = maxAniso;
-    scene.background = tex;
-  });
+  // atmosphere: smooth sunset gradient — reads consistently across every glass
+  // bay, unlike a photo which shows a different unrelated crop per panel
+  var skyCanvas = document.createElement("canvas");
+  skyCanvas.width = 8; skyCanvas.height = 512;
+  var skyCtx = skyCanvas.getContext("2d");
+  var skyGrad = skyCtx.createLinearGradient(0, 0, 0, 512);
+  skyGrad.addColorStop(0, "#1B2A4A");
+  skyGrad.addColorStop(0.42, "#5B3E5C");
+  skyGrad.addColorStop(0.68, "#B5566B");
+  skyGrad.addColorStop(0.86, "#E8935A");
+  skyGrad.addColorStop(1, "#F6C86B");
+  skyCtx.fillStyle = skyGrad;
+  skyCtx.fillRect(0, 0, 8, 512);
+  var skyTex = new THREE.CanvasTexture(skyCanvas);
+  scene.background = skyTex;
 
-  // lights — dim cool moonlight fill; the warm interior fixtures do the actual work
-  scene.add(new THREE.AmbientLight(0xaabbdd, 0.35));
-  scene.add(new THREE.HemisphereLight(0x2a3550, 0x2a2216, 0.4));
-  var moon = new THREE.DirectionalLight(0xaac4e6, 0.35);
-  moon.position.set(4, 20, START_Z - 10);
-  moon.target.position.set(0, 0, START_Z - 30);
-  scene.add(moon);
-  scene.add(moon.target);
+  // lights — dim warm dusk fill; the interior fixtures still do the actual work
+  scene.add(new THREE.AmbientLight(0xe0b8b0, 0.4));
+  scene.add(new THREE.HemisphereLight(0x6b4a5c, 0x2a2216, 0.45));
+  var duskLight = new THREE.DirectionalLight(0xe8935a, 0.4);
+  duskLight.position.set(4, 20, START_Z - 10);
+  duskLight.target.position.set(0, 0, START_Z - 30);
+  scene.add(duskLight);
+  scene.add(duskLight.target);
   for (var lz = START_Z - 4; lz > END_Z + 4; lz -= 11) {
     var pl = new THREE.PointLight(0xffe9c2, 65, 26, 2);
     pl.position.set(0, 6.5, lz);
