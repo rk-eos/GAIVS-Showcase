@@ -58,7 +58,7 @@
   }
 
   // ===========================================================================
-  // AUDIO — synthesized applause + sparkle, no external sound files needed
+  // AUDIO — real applause clip + a synthesized sparkle chime for 1st place
   // ===========================================================================
   var audioCtx = null;
   function getAudioCtx() {
@@ -71,50 +71,12 @@
     return audioCtx;
   }
 
+  var applauseSrc = "assets/audio/applause.mp3";
   function playApplause(intensity) {
-    var ctx = getAudioCtx();
-    if (!ctx) return;
     intensity = intensity || 1;
-    var duration = 1.1 * intensity;
-    var bufferSize = Math.floor(ctx.sampleRate * duration);
-    var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    var data = buffer.getChannelData(0);
-
-    // build an envelope from many short randomly-timed "clap" bursts
-    var envelope = new Float32Array(bufferSize);
-    var clapCount = Math.floor(30 * intensity);
-    for (var c = 0; c < clapCount; c++) {
-      var start = Math.floor(Math.random() * bufferSize * 0.85);
-      var len = Math.floor(ctx.sampleRate * (0.02 + Math.random() * 0.03));
-      var peak = 0.35 + Math.random() * 0.5;
-      for (var i = 0; i < len && start + i < bufferSize; i++) {
-        var decay = Math.exp(-i / (len * 0.35));
-        envelope[start + i] = Math.max(envelope[start + i], peak * decay);
-      }
-    }
-    // overall fade in/out so it doesn't start/stop abruptly
-    var fadeSamples = Math.floor(ctx.sampleRate * 0.08);
-    for (var f = 0; f < fadeSamples; f++) {
-      var m = f / fadeSamples;
-      envelope[f] *= m;
-      envelope[bufferSize - 1 - f] *= m;
-    }
-    for (var s = 0; s < bufferSize; s++) {
-      data[s] = (Math.random() * 2 - 1) * envelope[s];
-    }
-
-    var source = ctx.createBufferSource();
-    source.buffer = buffer;
-    var filter = ctx.createBiquadFilter();
-    filter.type = "bandpass";
-    filter.frequency.value = 2200;
-    filter.Q.value = 0.6;
-    var gain = ctx.createGain();
-    gain.gain.value = 0.7;
-    source.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-    source.start();
+    var el = new Audio(applauseSrc);
+    el.volume = Math.min(1, 0.75 * intensity);
+    el.play().catch(function () { /* autoplay-policy edge cases — ignore */ });
   }
 
   function playSparkle() {
@@ -247,6 +209,30 @@
     stepIndex++;
     updateActionUI();
   });
+
+  function resetReveal() {
+    stepIndex = 0;
+    revealedProjectByPlace = {};
+
+    [1, 2, 3].forEach(function (place) {
+      var card = document.getElementById("card-" + place);
+      var locked = card.querySelector(".podium__locked");
+      var revealed = card.querySelector(".podium__revealed");
+      gsap.killTweensOf(card);
+      gsap.set(locked, { display: "", opacity: 1, scale: 1 });
+      gsap.set(revealed, { opacity: 0, y: 14, scale: 0.92 });
+      revealed.hidden = true;
+      card.style.boxShadow = "";
+    });
+
+    enterHallBtn.hidden = true;
+    revealBtn.hidden = false;
+    gsap.set(revealBtn, { opacity: 1, y: 0 });
+    updateActionUI();
+  }
+
+  var resetRevealBtn = document.getElementById("resetRevealBtn");
+  if (resetRevealBtn) resetRevealBtn.addEventListener("click", resetReveal);
 
   // initial podium entrance animation
   window.addEventListener("DOMContentLoaded", function () {
