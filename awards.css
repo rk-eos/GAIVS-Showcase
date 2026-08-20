@@ -1,3 +1,5 @@
+body { overflow: hidden; height: 100vh; }
+
 #particleBg {
   position: fixed;
   inset: 0;
@@ -8,33 +10,35 @@
 .reveal {
   position: relative;
   z-index: 1;
-  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 64px 5vw 60px;
+  padding: 24px 5vw 20px;
+  box-sizing: border-box;
 }
 
 .reveal__logo {
-  width: min(280px, 60vw);
+  width: min(160px, 40vw);
   height: auto;
-  margin-bottom: 22px;
+  margin-bottom: 8px;
 }
 
 .reveal .eyebrow {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--gold-hover);
-  margin: 0 0 14px;
+  margin: 0 0 6px;
 }
 
 .reveal__title {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(34px, 6vw, 62px);
+  font-size: clamp(24px, 4.2vw, 38px);
   color: var(--ink);
   margin: 0;
   letter-spacing: -0.01em;
@@ -44,8 +48,8 @@
 .reveal__subtitle {
   font-family: var(--font-body);
   color: var(--body-text);
-  font-size: 17px;
-  margin: 14px 0 48px;
+  font-size: 14px;
+  margin: 6px 0 16px;
 }
 
 /* ---------------------------------------------------------------------------
@@ -55,45 +59,45 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 22px;
+  gap: 16px;
   width: 100%;
-  max-width: 980px;
-  margin-bottom: 44px;
+  max-width: 900px;
+  margin-bottom: 16px;
 }
 
 .podium__slot {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 280px;
+  width: 240px;
   opacity: 0;
   transform: translateY(24px);
 }
-.podium__slot--first { width: 320px; }
+.podium__slot--first { width: 270px; }
 
 .podium__card {
   width: 100%;
-  min-height: 190px;
+  min-height: 130px;
   background: var(--card-bg);
   border-radius: var(--radius-md);
   box-shadow: 0 6px 24px rgba(38,51,59,0.08);
-  padding: 22px 20px;
+  padding: 14px 16px;
   margin-bottom: -1px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.podium__card--first { min-height: 220px; box-shadow: 0 10px 34px rgba(223,166,62,0.18); }
+.podium__card--first { min-height: 150px; box-shadow: 0 10px 34px rgba(223,166,62,0.18); }
 
 .podium__locked {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   color: var(--meta);
 }
-.podium__lock { font-size: 28px; filter: grayscale(1); opacity: 0.5; }
+.podium__lock { font-size: 22px; filter: grayscale(1); opacity: 0.5; }
 .podium__rank-badge {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -105,84 +109,84 @@
 .podium__revealed { width: 100%; text-align: left; }
 .podium__track {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin: 0 0 6px;
+  margin: 0 0 4px;
 }
 .podium__revealed h2 {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1.15;
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   color: var(--ink);
 }
 .podium__students {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   color: var(--meta);
-  margin: 0 0 10px;
+  margin: 0 0 6px;
 }
 .podium__blurb {
-  font-size: 14px;
-  line-height: 1.45;
+  font-size: 12.5px;
+  line-height: 1.4;
   color: var(--body-text);
-  margin: 0 0 14px;
+  margin: 0 0 8px;
 }
 .podium__watch-btn {
   background: var(--tint-teal);
   color: var(--teal-hover);
   border: none;
   border-radius: 999px;
-  padding: 7px 14px;
+  padding: 5px 12px;
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 10.5px;
 }
 .podium__watch-btn:hover { background: var(--teal); color: #fff; }
 
 .podium__prize {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 10.5px;
   font-weight: 500;
   color: var(--gold-hover);
   background: var(--tint-gold);
   border-radius: 999px;
-  padding: 6px 12px;
-  margin: 0 0 14px;
+  padding: 4px 10px;
+  margin: 0 0 8px;
 }
-.podium__prize--first { color: #7a5416; font-size: 12.5px; }
+.podium__prize--first { color: #7a5416; font-size: 11px; }
 .podium__prize .prize-sep { color: var(--meta); margin: 0 2px; }
 
 .podium__pedestal {
   width: 90%;
-  border-radius: 10px 10px 0 0;
+  border-radius: 8px 8px 0 0;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 10px;
+  padding-top: 6px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 28px;
+  font-size: 20px;
   color: #fff;
 }
-.podium__pedestal--3 { height: 60px; background: var(--maroon); }
-.podium__pedestal--2 { height: 60px; background: var(--teal); }
-.podium__pedestal--1 { height: 96px; background: var(--gold); font-size: 34px; }
+.podium__pedestal--3 { height: 32px; background: var(--maroon); }
+.podium__pedestal--2 { height: 32px; background: var(--teal); }
+.podium__pedestal--1 { height: 50px; background: var(--gold); font-size: 24px; }
 
 /* ---------------------------------------------------------------------------
    BONUS CARD — academic credit for every participant
 --------------------------------------------------------------------------- */
 .bonus-card {
   width: 100%;
-  max-width: 700px;
-  margin: 0 auto 8px;
+  max-width: 640px;
+  margin: 0 auto 0;
   background: var(--card-bg);
   border-radius: var(--radius-md);
   box-shadow: 0 6px 24px rgba(38,51,59,0.06);
-  padding: 22px 28px;
-  min-height: 88px;
+  padding: 14px 20px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -191,12 +195,12 @@
 .bonus-card__locked {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: var(--meta);
 }
 .bonus-card__badge {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.04em;
 }
 
@@ -204,20 +208,20 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
   text-align: left;
 }
-.bonus-card__logo { width: 52px; height: 52px; flex-shrink: 0; object-fit: contain; }
+.bonus-card__logo { width: 36px; height: 36px; flex-shrink: 0; object-fit: contain; }
 .bonus-card__revealed h3 {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 17px;
-  margin: 0 0 4px;
+  font-size: 14px;
+  margin: 0 0 2px;
   color: var(--ink);
 }
 .bonus-card__revealed p {
-  font-size: 13.5px;
-  line-height: 1.45;
+  font-size: 12px;
+  line-height: 1.35;
   color: var(--body-text);
   margin: 0;
   max-width: 60ch;
@@ -225,21 +229,21 @@
 .bonus-card__revealed strong { color: var(--teal-hover); }
 
 @media (max-width: 640px) {
-  .bonus-card__revealed { flex-direction: column; text-align: center; gap: 10px; }
+  .bonus-card__revealed { flex-direction: column; text-align: center; gap: 8px; }
 }
 
 /* ---------------------------------------------------------------------------
    ACTION AREA
 --------------------------------------------------------------------------- */
-.reveal__action { min-height: 56px; display: flex; align-items: center; justify-content: center; }
+.reveal__action { min-height: 40px; display: flex; align-items: center; justify-content: center; margin-top: 12px; }
 
 .reveal-reset-link {
   display: block;
-  margin: 18px auto 0;
+  margin: 8px auto 0;
   background: none;
   border: none;
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 10.5px;
   color: var(--meta);
   cursor: pointer;
   opacity: 0.7;
@@ -252,10 +256,10 @@
   color: #fff;
   border: none;
   border-radius: 999px;
-  padding: 15px 34px;
+  padding: 11px 26px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   text-decoration: none;
   box-shadow: 0 6px 20px rgba(223,166,62,0.3);
   transition: background 0.15s ease, transform 0.15s ease;
