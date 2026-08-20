@@ -58,6 +58,106 @@
   }
 
   // ===========================================================================
+  // AUDIO — synthesized applause + sparkle, no external sound files needed
+  // ===========================================================================
+  var audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playApplause(intensity) {
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    intensity = intensity || 1;
+    var duration = 1.1 * intensity;
+    var bufferSize = Math.floor(ctx.sampleRate * duration);
+    var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    var data = buffer.getChannelData(0);
+
+    // build an envelope from many short randomly-timed "clap" bursts
+    var envelope = new Float32Array(bufferSize);
+    var clapCount = Math.floor(30 * intensity);
+    for (var c = 0; c < clapCount; c++) {
+      var start = Math.floor(Math.random() * bufferSize * 0.85);
+      var len = Math.floor(ctx.sampleRate * (0.02 + Math.random() * 0.03));
+      var peak = 0.35 + Math.random() * 0.5;
+      for (var i = 0; i < len && start + i < bufferSize; i++) {
+        var decay = Math.exp(-i / (len * 0.35));
+        envelope[start + i] = Math.max(envelope[start + i], peak * decay);
+      }
+    }
+    // overall fade in/out so it doesn't start/stop abruptly
+    var fadeSamples = Math.floor(ctx.sampleRate * 0.08);
+    for (var f = 0; f < fadeSamples; f++) {
+      var m = f / fadeSamples;
+      envelope[f] *= m;
+      envelope[bufferSize - 1 - f] *= m;
+    }
+    for (var s = 0; s < bufferSize; s++) {
+      data[s] = (Math.random() * 2 - 1) * envelope[s];
+    }
+
+    var source = ctx.createBufferSource();
+    source.buffer = buffer;
+    var filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = 2200;
+    filter.Q.value = 0.6;
+    var gain = ctx.createGain();
+    gain.gain.value = 0.7;
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    source.start();
+  }
+
+  function playSparkle() {
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    var notes = [783.99, 987.77, 1174.66, 1567.98, 1975.53]; // G5 B5 D6 G6 B6
+    var startTime = ctx.currentTime;
+    notes.forEach(function (freq, i) {
+      var t = startTime + i * 0.09;
+      var osc = ctx.createOscillator();
+      osc.type = "triangle";
+      osc.frequency.value = freq;
+      var gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.25, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.55);
+    });
+
+    // bright shimmer layer — short burst of high-passed noise
+    var shimmerDur = 0.6;
+    var buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * shimmerDur), ctx.sampleRate);
+    var d = buf.getChannelData(0);
+    for (var i = 0; i < d.length; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.3));
+    }
+    var noiseSrc = ctx.createBufferSource();
+    noiseSrc.buffer = buf;
+    var hp = ctx.createBiquadFilter();
+    hp.type = "highpass";
+    hp.frequency.value = 5000;
+    var shimmerGain = ctx.createGain();
+    shimmerGain.gain.value = 0.18;
+    noiseSrc.connect(hp);
+    hp.connect(shimmerGain);
+    shimmerGain.connect(ctx.destination);
+    noiseSrc.start(startTime);
+  }
+
+  // ===========================================================================
   // REVEAL SEQUENCE
   // ===========================================================================
   var trackByCode = {};
@@ -103,7 +203,11 @@
     var revealed = card.querySelector(".podium__revealed");
 
     var tl = gsap.timeline();
-    tl.to(locked, { opacity: 0, scale: 0.8, duration: 0.22, ease: "power1.in" })
+    tl.call(function () {
+      playApplause(place === 1 ? 1.5 : 1);
+      if (place === 1) playSparkle();
+    })
+      .to(locked, { opacity: 0, scale: 0.8, duration: 0.22, ease: "power1.in" })
       .set(locked, { display: "none" })
       .set(revealed, { hidden: false })
       .call(function () { revealed.hidden = false; })

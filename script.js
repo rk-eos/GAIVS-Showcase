@@ -379,7 +379,7 @@
     new THREE.PlaneGeometry(6, 2.25),
     toonMaterial(0xffffff, { map: bannerTexture })
   );
-  banner.position.set(0, 1.9, END_WALL_Z - 0.83);
+  banner.position.set(0, 3.8, END_WALL_Z - 0.83);
   scene.add(banner);
 
   var logoImg = new Image();
@@ -402,7 +402,7 @@
   logoImg.src = "assets/img/gaivs-logo-full.png";
 
   var endGlow = new THREE.PointLight(0xffe9c2, 20, 12, 2);
-  endGlow.position.set(0, 3, END_WALL_Z - 3);
+  endGlow.position.set(0, 3.6, END_WALL_Z - 3);
   scene.add(endGlow);
 
   // booths — museum-plinth style: cream base + colored accent top, with a soft ground shadow
@@ -453,6 +453,63 @@
     project.__meshes = [base, top];
     project.__z = pos.z;
   });
+
+  // winners podium — the finale tableau at the end of the hall. Sits just
+  // beyond the camera's reachable travel (END_Z) so it's always seen from a
+  // respectful distance and never clipped through.
+  (function buildPodium() {
+    if (typeof WINNERS === "undefined" || !WINNERS.length) return;
+    var projectIndexById = {};
+    PROJECTS.forEach(function (p, i) { projectIndexById[p.id] = i; });
+
+    var podiumZ = END_WALL_Z + 2.5;
+    var specByPlace = {
+      1: { x: 0, height: 1.3, color: 0xdfa63e, label: "1ST" },
+      2: { x: -1.9, height: 0.9, color: 0x37788a, label: "2ND" },
+      3: { x: 1.9, height: 0.7, color: 0x8e2e4d, label: "3RD" },
+    };
+
+    WINNERS.forEach(function (winner) {
+      var idx = projectIndexById[winner.projectId];
+      if (idx === undefined) return;
+      var project = PROJECTS[idx];
+      var spec = specByPlace[winner.place];
+      if (!spec) return;
+
+      var block = new THREE.Mesh(
+        new THREE.BoxGeometry(1.5, spec.height, 1.3),
+        toonMaterial(spec.color, { emissive: spec.color, emissiveIntensity: 0.1 })
+      );
+      block.position.set(spec.x, spec.height / 2, podiumZ);
+      block.userData.projectIndex = idx;
+      addOutline(block, 1.05);
+      scene.add(block);
+      clickableMeshes.push(block);
+
+      var shadowBlob = new THREE.Mesh(
+        new THREE.CircleGeometry(1.05, 24),
+        new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.16 })
+      );
+      shadowBlob.rotation.x = -Math.PI / 2;
+      shadowBlob.position.set(spec.x, 0.015, podiumZ);
+      scene.add(shadowBlob);
+
+      var texture = makeLabelTexture(spec.label, project.title);
+      var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+      var sprite = new THREE.Sprite(spriteMat);
+      sprite.scale.set(1.9, 0.95, 1);
+      var baseY = spec.height + 0.9;
+      sprite.position.set(spec.x, baseY, podiumZ);
+      sprite.userData.baseY = baseY;
+      sprite.userData.phase = winner.place * 0.8;
+      scene.add(sprite);
+      floatingSprites.push(sprite);
+    });
+
+    var podiumGlow = new THREE.PointLight(0xffe9c2, 26, 10, 2);
+    podiumGlow.position.set(0, 3.2, podiumZ + 1.5);
+    scene.add(podiumGlow);
+  })();
 
   // ===========================================================================
   // WALKING
