@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="brand.css?v=7">
-<link rel="stylesheet" href="awards.css?v=7">
+<link rel="stylesheet" href="brand.css?v=8">
+<link rel="stylesheet" href="awards.css?v=8">
 </head>
 <body>
 
@@ -36,6 +36,7 @@
           <h2 id="title-3"></h2>
           <p class="podium__students" id="students-3"></p>
           <p class="podium__blurb" id="blurb-3"></p>
+          <p class="podium__prize">$500 <span class="prize-sep">&middot;</span> 10,000 vibecoding credits on SparkEd CodeBox</p>
           <button class="podium__watch-btn" data-place="3">&#9654; Watch pitch</button>
         </div>
       </div>
@@ -53,6 +54,7 @@
           <h2 id="title-1"></h2>
           <p class="podium__students" id="students-1"></p>
           <p class="podium__blurb" id="blurb-1"></p>
+          <p class="podium__prize podium__prize--first">$3,000 <span class="prize-sep">&middot;</span> 10,000 vibecoding credits on SparkEd CodeBox</p>
           <button class="podium__watch-btn" data-place="1">&#9654; Watch pitch</button>
         </div>
       </div>
@@ -70,10 +72,25 @@
           <h2 id="title-2"></h2>
           <p class="podium__students" id="students-2"></p>
           <p class="podium__blurb" id="blurb-2"></p>
+          <p class="podium__prize">$1,500 <span class="prize-sep">&middot;</span> 10,000 vibecoding credits on SparkEd CodeBox</p>
           <button class="podium__watch-btn" data-place="2">&#9654; Watch pitch</button>
         </div>
       </div>
       <div class="podium__pedestal podium__pedestal--2"><span>2</span></div>
+    </div>
+  </div>
+
+  <div class="bonus-card" id="bonusCard">
+    <div class="bonus-card__locked">
+      <span class="podium__lock">&#128274;</span>
+      <span class="bonus-card__badge">Bonus, for every student</span>
+    </div>
+    <div class="bonus-card__revealed" hidden>
+      <img src="assets/img/eos-logo.png" alt="Elite Open School" class="bonus-card__logo">
+      <div>
+        <h3>Every participant earns academic credit</h3>
+        <p>All 20 teams — not just the top 3 — receive a <strong>half-semester elective credit</strong> through Elite Open School: recognized coursework from an accredited private school.</p>
+      </div>
     </div>
   </div>
 
@@ -106,6 +123,6 @@
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-<script src="awards.js?v=6"></script>
+<script src="awards.js?v=7"></script>
 </body>
 </html>
