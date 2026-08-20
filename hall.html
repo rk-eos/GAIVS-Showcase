@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 
@@ -67,15 +67,19 @@
     <p class="panel__blurb" id="panelBlurb"></p>
 
     <div class="panel__media">
-      <h3 class="panel__media-label">Pitch video</h3>
-      <div class="media-frame media-frame--video">
-        <video id="panelVideo" controls preload="metadata"></video>
+      <div class="media-col">
+        <h3 class="panel__media-label">Pitch video</h3>
+        <div class="media-frame media-frame--video">
+          <video id="panelVideo" controls preload="metadata"></video>
+        </div>
       </div>
 
-      <h3 class="panel__media-label">Pitch deck</h3>
-      <div class="media-frame media-frame--deck">
-        <iframe id="panelDeck" title="Pitch deck viewer"></iframe>
-        <a id="panelDeckFallback" class="deck-fallback-link" target="_blank" rel="noopener">Open deck in new tab &#8599;</a>
+      <div class="media-col">
+        <h3 class="panel__media-label">Pitch deck</h3>
+        <div class="media-frame media-frame--deck">
+          <iframe id="panelDeck" title="Pitch deck viewer"></iframe>
+          <a id="panelDeckFallback" class="deck-fallback-link" target="_blank" rel="noopener">Open deck in new tab &#8599;</a>
+        </div>
       </div>
     </div>
   </div>
@@ -83,6 +87,6 @@
 
 <script src="data/projects.js?v=4"></script>
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script src="script.js?v=16"></script>
+<script src="script.js?v=17"></script>
 </body>
 </html>
