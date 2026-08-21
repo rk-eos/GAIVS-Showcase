@@ -72,20 +72,25 @@
   }
 
   var applauseSrc = "assets/audio/applause.mp3";
-  var FADE_OUT_SECONDS = 1.4;
+  var FADE_OUT_SECONDS = 2;
   function playApplause(intensity) {
     intensity = intensity || 1;
     var baseVolume = Math.min(1, 0.75 * intensity);
     var el = new Audio(applauseSrc);
     el.volume = baseVolume;
-    el.addEventListener("timeupdate", function () {
-      if (!el.duration) return;
-      var remaining = el.duration - el.currentTime;
-      if (remaining < FADE_OUT_SECONDS) {
-        el.volume = Math.max(0, baseVolume * (remaining / FADE_OUT_SECONDS));
-      }
-    });
     el.play().catch(function () { /* autoplay-policy edge cases — ignore */ });
+
+    function tick() {
+      if (el.paused || el.ended) return;
+      if (el.duration) {
+        var remaining = el.duration - el.currentTime;
+        if (remaining < FADE_OUT_SECONDS) {
+          el.volume = Math.max(0, baseVolume * (remaining / FADE_OUT_SECONDS));
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   }
 
   function playSparkle() {
