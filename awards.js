@@ -81,7 +81,7 @@
     el.play().catch(function () { /* autoplay-policy edge cases — ignore */ });
 
     function tick() {
-      if (el.paused || el.ended) return;
+      if (el.ended) return;
       if (el.duration) {
         var remaining = el.duration - el.currentTime;
         if (remaining < FADE_OUT_SECONDS) {
