@@ -36,3 +36,7 @@ button { font-family: inherit; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+
+/* page fade transition, shared across pages */
+html.page-fade { opacity: 0; transition: opacity 0.18s ease; }
+html.page-fade.page-fade-in { opacity: 1; }

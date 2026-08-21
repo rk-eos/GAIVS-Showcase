@@ -119,6 +119,16 @@ body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
   touch-action: none;
 }
 
+.hallway-loader {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--page-bg);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono); font-size: 13px; color: var(--meta);
+  transition: opacity 0.3s ease;
+}
+.hallway-loader.is-hidden { opacity: 0; pointer-events: none; }
+
 .hallway-hint {
   position: absolute;
   top: 16px; left: 50%;

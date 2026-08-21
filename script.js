@@ -676,6 +676,8 @@
   resize();
   updateCounter();
   animate();
+  var hallwayLoader = document.getElementById("hallwayLoader");
+  if (hallwayLoader) hallwayLoader.classList.add("is-hidden");
 
   // deep link: hall.html?booth=05 walks straight there and opens the panel
   (function handleDeepLink() {

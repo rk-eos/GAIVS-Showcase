@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="transitions.js?v=1"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Global AI Venture Studio — student teams build real AI ventures. Explore the showcase, meet the winners, and see all 20 projects.">
+<meta name="description" content="Global AI Venture Studio: student teams build real AI ventures. Explore the showcase, meet the winners, and see all 20 projects.">
 <meta property="og:title" content="Project Showcase · Global AI Venture Studio">
 <meta property="og:description" content="Student teams build real AI ventures with AI. Explore the showcase and meet the winners.">
 <meta property="og:type" content="website">
@@ -15,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=24">
+<link rel="stylesheet" href="style.css?v=25">
 </head>
 <body>
 
@@ -36,6 +37,7 @@
 
 <main class="hallway-wrap">
   <canvas id="hallwayCanvas" aria-label="3D walkthrough of exhibition booths"></canvas>
+  <div id="hallwayLoader" class="hallway-loader"><span>Loading the hall&hellip;</span></div>
 
   <div class="hallway-hint" id="hallwayHint">
     Scroll, drag the bar below, or use &larr; &rarr; to walk &middot; click a booth to open it
@@ -88,6 +90,6 @@
 <script src="data/projects.js?v=4"></script>
 <script src="data/winners.js?v=1"></script>
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script src="script.js?v=24"></script>
+<script src="script.js?v=25"></script>
 </body>
 </html>
