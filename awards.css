@@ -49,7 +49,25 @@ body { overflow: hidden; height: 100vh; }
   font-family: var(--font-body);
   color: var(--body-text);
   font-size: 14px;
-  margin: 6px 0 16px;
+  margin: 6px 0 4px;
+}
+
+.reveal__stats {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--gold-hover);
+  margin: 0 0 16px;
+}
+
+.thank-you-note {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11.5px;
+  color: var(--meta);
+  opacity: 0.6;
+  margin: 14px 0 0;
+  text-align: center;
 }
 
 /* ---------------------------------------------------------------------------

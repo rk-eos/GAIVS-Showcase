@@ -677,6 +677,16 @@
   updateCounter();
   animate();
 
+  // deep link: hall.html?booth=05 walks straight there and opens the panel
+  (function handleDeepLink() {
+    var boothId = new URLSearchParams(location.search).get("booth");
+    if (!boothId) return;
+    var idx = PROJECTS.findIndex(function (p) { return p.id === boothId; });
+    if (idx === -1) return;
+    setProgress((PROJECTS[idx].__z - START_Z) / (END_Z - START_Z));
+    setTimeout(function () { openPanel(idx); }, 900);
+  })();
+
   // ===========================================================================
   // CLICK -> RAYCAST -> OPEN PANEL
   // ===========================================================================
@@ -700,6 +710,7 @@
   var panelClose = document.getElementById("panelClose");
   var panelPrev = document.getElementById("panelPrev");
   var panelNext = document.getElementById("panelNext");
+  var panelShare = document.getElementById("panelShare");
   var panelBoothId = document.getElementById("panelBoothId");
   var panelTitle = document.getElementById("panelTitle");
   var panelStudents = document.getElementById("panelStudents");
@@ -769,6 +780,14 @@
   overlay.addEventListener("click", closePanel);
   panelClose.addEventListener("click", closePanel);
   panelPrev.addEventListener("click", function () { stepPanel(-1); });
+  panelShare.addEventListener("click", function () {
+    if (currentIndex === null) return;
+    var url = location.origin + location.pathname + "?booth=" + PROJECTS[currentIndex].id;
+    var promise = navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject();
+    promise.then(function () { panelShare.textContent = "Copied!"; })
+      .catch(function () { window.prompt("Copy this link:", url); });
+    setTimeout(function () { panelShare.innerHTML = "&#128279; Share"; }, 1600);
+  });
   panelNext.addEventListener("click", function () { stepPanel(1); });
 
   document.addEventListener("keydown", function (e) {

@@ -243,6 +243,7 @@
 
   var resetRevealBtn = document.getElementById("resetRevealBtn");
   if (resetRevealBtn) resetRevealBtn.addEventListener("click", resetReveal);
+  if (new URLSearchParams(location.search).get("present") && resetRevealBtn) resetRevealBtn.style.display = "none";
 
   // initial podium entrance animation
   window.addEventListener("DOMContentLoaded", function () {
