@@ -667,9 +667,7 @@
   var panelBlurb = document.getElementById("panelBlurb");
   var panelVideo = document.getElementById("panelVideo");
   var panelVideoPlaceholder = document.getElementById("panelVideoPlaceholder");
-  var panelDeck = document.getElementById("panelDeck");
-  var panelDeckPlaceholder = document.getElementById("panelDeckPlaceholder");
-  var panelDeckFallback = document.getElementById("panelDeckFallback");
+  var panelDeckLink = document.getElementById("panelDeckLink");
   var currentIndex = null;
 
   function panelIsOpen() { return !panel.hidden; }
@@ -697,16 +695,10 @@
     }
 
     if (hasDeck) {
-      panelDeck.hidden = false;
-      panelDeckPlaceholder.hidden = true;
-      panelDeck.src = project.deckSrc;
-      panelDeckFallback.href = project.deckSrc;
-      panelDeckFallback.style.display = "inline-block";
+      panelDeckLink.href = project.deckSrc;
+      panelDeckLink.style.display = "inline-flex";
     } else {
-      panelDeck.hidden = true;
-      panelDeck.removeAttribute("src");
-      panelDeckPlaceholder.hidden = false;
-      panelDeckFallback.style.display = "none";
+      panelDeckLink.style.display = "none";
     }
 
     overlay.hidden = false;

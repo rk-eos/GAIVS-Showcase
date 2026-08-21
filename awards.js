@@ -276,8 +276,7 @@
   var watchTitle = document.getElementById("watchTitle");
   var watchVideo = document.getElementById("watchVideo");
   var watchVideoPlaceholder = document.getElementById("watchVideoPlaceholder");
-  var watchDeck = document.getElementById("watchDeck");
-  var watchDeckPlaceholder = document.getElementById("watchDeckPlaceholder");
+  var watchDeckLink = document.getElementById("watchDeckLink");
 
   function openWatch(project) {
     watchTitle.textContent = project.title;
@@ -295,13 +294,10 @@
     }
 
     if (deckUrl) {
-      watchDeck.hidden = false;
-      watchDeckPlaceholder.hidden = true;
-      watchDeck.src = deckUrl;
+      watchDeckLink.href = deckUrl;
+      watchDeckLink.style.display = "inline-flex";
     } else {
-      watchDeck.hidden = true;
-      watchDeck.removeAttribute("src");
-      watchDeckPlaceholder.hidden = false;
+      watchDeckLink.style.display = "none";
     }
 
     watchOverlay.hidden = false;
@@ -317,7 +313,6 @@
         watchOverlay.hidden = true;
         watchModal.hidden = true;
         watchVideo.removeAttribute("src");
-        watchDeck.removeAttribute("src");
       },
     });
   }

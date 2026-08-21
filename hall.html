@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=19">
+<link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
 
@@ -74,22 +74,14 @@
           <div id="panelVideoPlaceholder" class="media-placeholder" hidden>Video not yet uploaded</div>
         </div>
       </div>
-
-      <div class="media-col">
-        <h3 class="panel__media-label">Pitch deck</h3>
-        <div class="media-frame media-frame--deck">
-          <iframe id="panelDeck" title="Pitch deck viewer"></iframe>
-          <div id="panelDeckPlaceholder" class="media-placeholder" hidden>Deck not yet uploaded</div>
-          <a id="panelDeckFallback" class="deck-fallback-link" target="_blank" rel="noopener">Open deck in new tab &#8599;</a>
-        </div>
-      </div>
     </div>
+    <a id="panelDeckLink" class="deck-open-link" target="_blank" rel="noopener">&#128196; Open pitch deck &#8599;</a>
   </div>
 </aside>
 
 <script src="data/projects.js?v=4"></script>
 <script src="data/winners.js?v=1"></script>
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script src="script.js?v=19"></script>
+<script src="script.js?v=20"></script>
 </body>
 </html>

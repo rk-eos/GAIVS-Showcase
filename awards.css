@@ -59,36 +59,36 @@ body { overflow: hidden; height: 100vh; }
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 16px;
+  gap: 28px;
   width: 100%;
-  max-width: 900px;
-  margin-bottom: 16px;
+  max-width: 1280px;
+  margin-bottom: 20px;
 }
 
 .podium__slot {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 240px;
+  width: 340px;
   opacity: 0;
   transform: translateY(24px);
 }
-.podium__slot--first { width: 270px; }
+.podium__slot--first { width: 390px; }
 
 .podium__card {
   width: 100%;
-  min-height: 130px;
+  min-height: 170px;
   background: var(--card-bg);
   border-radius: var(--radius-md);
   box-shadow: 0 6px 24px rgba(38,51,59,0.08);
-  padding: 14px 16px;
+  padding: 22px 26px;
   margin-bottom: -1px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.podium__card--first { min-height: 150px; box-shadow: 0 10px 34px rgba(223,166,62,0.18); }
+.podium__card--first { min-height: 195px; box-shadow: 0 10px 34px rgba(223,166,62,0.18); }
 
 .podium__locked {
   display: flex;
@@ -109,55 +109,62 @@ body { overflow: hidden; height: 100vh; }
 .podium__revealed { width: 100%; text-align: left; }
 .podium__track {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin: 0 0 4px;
+  margin: 0 0 5px;
 }
 .podium__revealed h2 {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 21px;
   line-height: 1.15;
-  margin: 0 0 4px;
+  margin: 0 0 5px;
   color: var(--ink);
 }
 .podium__students {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--meta);
-  margin: 0 0 6px;
+  margin: 0 0 12px;
 }
 .podium__blurb {
-  font-size: 12.5px;
-  line-height: 1.4;
+  font-size: 13.5px;
+  line-height: 1.42;
   color: var(--body-text);
-  margin: 0 0 8px;
+  margin: 0 0 12px;
 }
 .podium__watch-btn {
   background: var(--tint-teal);
   color: var(--teal-hover);
   border: none;
   border-radius: 999px;
-  padding: 5px 12px;
+  padding: 7px 15px;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11.5px;
 }
 .podium__watch-btn:hover { background: var(--teal); color: #fff; }
 
 .podium__prize {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 500;
-  color: var(--gold-hover);
-  background: var(--tint-gold);
-  border-radius: 999px;
-  padding: 4px 10px;
-  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--gold), var(--gold-hover));
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 0 0 12px;
+  box-shadow: 0 3px 10px rgba(223,166,62,0.35);
 }
-.podium__prize--first { color: #7a5416; font-size: 11px; }
-.podium__prize .prize-sep { color: var(--meta); margin: 0 2px; }
+.podium__prize--first {
+  font-size: 17px;
+  padding: 12px 16px;
+  box-shadow: 0 5px 16px rgba(223,166,62,0.5);
+}
+.podium__prize .prize-sep { opacity: 0.6; margin: 0 1px; font-weight: 400; }
 
 .podium__pedestal {
   width: 90%;
@@ -165,22 +172,22 @@ body { overflow: hidden; height: 100vh; }
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 6px;
+  padding-top: 8px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 20px;
+  font-size: 24px;
   color: #fff;
 }
-.podium__pedestal--3 { height: 32px; background: var(--maroon); }
-.podium__pedestal--2 { height: 32px; background: var(--teal); }
-.podium__pedestal--1 { height: 50px; background: var(--gold); font-size: 24px; }
+.podium__pedestal--3 { height: 40px; background: var(--maroon); }
+.podium__pedestal--2 { height: 40px; background: var(--teal); }
+.podium__pedestal--1 { height: 64px; background: var(--gold); font-size: 30px; }
 
 /* ---------------------------------------------------------------------------
    BONUS CARD — academic credit for every participant
 --------------------------------------------------------------------------- */
 .bonus-card {
   width: 100%;
-  max-width: 640px;
+  max-width: 720px;
   margin: 0 auto 0;
   background: var(--card-bg);
   border-radius: var(--radius-md);
@@ -208,20 +215,20 @@ body { overflow: hidden; height: 100vh; }
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 20px;
   text-align: left;
 }
-.bonus-card__logo { width: 36px; height: 36px; flex-shrink: 0; object-fit: contain; }
+.bonus-card__logo { width: 46px; height: 46px; flex-shrink: 0; object-fit: contain; }
 .bonus-card__revealed h3 {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 14px;
-  margin: 0 0 2px;
+  font-size: 16px;
+  margin: 0 0 3px;
   color: var(--ink);
 }
 .bonus-card__revealed p {
-  font-size: 12px;
-  line-height: 1.35;
+  font-size: 13px;
+  line-height: 1.4;
   color: var(--body-text);
   margin: 0;
   max-width: 60ch;
@@ -235,11 +242,11 @@ body { overflow: hidden; height: 100vh; }
 /* ---------------------------------------------------------------------------
    ACTION AREA
 --------------------------------------------------------------------------- */
-.reveal__action { min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 12px; }
+.reveal__action { min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 28px; margin-top: 20px; }
 
 .reveal-reset-link {
   display: block;
-  margin: 8px auto 0;
+  margin: 12px auto 0;
   background: none;
   border: none;
   font-family: var(--font-mono);
@@ -256,10 +263,10 @@ body { overflow: hidden; height: 100vh; }
   color: #fff;
   border: none;
   border-radius: 999px;
-  padding: 11px 26px;
+  padding: 14px 32px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15.5px;
   text-decoration: none;
   box-shadow: 0 6px 20px rgba(223,166,62,0.3);
   transition: background 0.15s ease, transform 0.15s ease;
@@ -300,18 +307,31 @@ body { overflow: hidden; height: 100vh; }
   font-family: var(--font-display); font-weight: 800; font-size: 22px;
   margin: 0 0 18px; padding-right: 30px; color: var(--ink);
 }
-.watch-media__frame { margin-bottom: 18px; position: relative; }
+.watch-media__frame { margin-bottom: 0; position: relative; }
 .watch-media__frame iframe {
   width: 100%; border: 1px solid var(--hairline); border-radius: var(--radius-sm);
   background: #000; display: block; aspect-ratio: 16/9;
 }
-.watch-media__frame--deck iframe { background: #fff; aspect-ratio: 3/2.6; }
 .watch-media__frame .media-placeholder {
   width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
   background: var(--surface); border: 1px dashed var(--hairline); border-radius: var(--radius-sm);
   color: var(--meta); font-family: var(--font-mono); font-size: 12.5px; text-align: center; padding: 12px;
 }
-.watch-media__frame--deck .media-placeholder { aspect-ratio: 3/2.6; }
+.deck-open-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 11px 20px;
+  background: var(--tint-teal);
+  color: var(--teal-hover);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.deck-open-link:hover { background: var(--teal); color: #fff; }
 
 /* ---------------------------------------------------------------------------
    RESPONSIVE
