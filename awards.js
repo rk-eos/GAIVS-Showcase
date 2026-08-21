@@ -129,7 +129,7 @@
   var winnerByPlace = {};
   (typeof WINNERS !== "undefined" ? WINNERS : []).forEach(function (w) { winnerByPlace[w.place] = w; });
 
-  var sequence = [3, 2, 1, "credit"];
+  var sequence = [3, 2, 1];
   var stepIndex = 0;
   var revealedProjectByPlace = {};
 
@@ -192,19 +192,6 @@
     }
   }
 
-  function revealBonus() {
-    var card = document.getElementById("bonusCard");
-    var locked = card.querySelector(".bonus-card__locked");
-    var revealed = card.querySelector(".bonus-card__revealed");
-
-    var tl = gsap.timeline();
-    tl.to(locked, { opacity: 0, scale: 0.9, duration: 0.2, ease: "power1.in" })
-      .set(locked, { display: "none" })
-      .call(function () { revealed.hidden = false; })
-      .fromTo(revealed, { opacity: 0, y: 10, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" });
-  }
-
   function updateActionUI() {
     if (stepIndex >= sequence.length) {
       revealBtn.hidden = true;
@@ -212,17 +199,13 @@
       gsap.fromTo(enterHallBtn, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 });
       return;
     }
-    var labels = {
-      3: "Reveal 3rd Place", 2: "Reveal 2nd Place", 1: "Reveal 1st Place \uD83C\uDFC6",
-      credit: "Reveal Bonus: Academic Credit \uD83C\uDF93",
-    };
+    var labels = { 3: "Reveal 3rd Place", 2: "Reveal 2nd Place", 1: "Reveal 1st Place \uD83C\uDFC6" };
     revealBtn.textContent = labels[sequence[stepIndex]];
   }
 
   revealBtn.addEventListener("click", function () {
     var place = sequence[stepIndex];
-    if (place === "credit") revealBonus();
-    else revealPlace(place);
+    revealPlace(place);
     stepIndex++;
     updateActionUI();
   });
@@ -243,12 +226,14 @@
     });
 
     var bonusCard = document.getElementById("bonusCard");
-    var bonusLocked = bonusCard.querySelector(".bonus-card__locked");
-    var bonusRevealed = bonusCard.querySelector(".bonus-card__revealed");
-    gsap.killTweensOf(bonusCard);
-    gsap.set(bonusLocked, { display: "", opacity: 1, scale: 1 });
-    gsap.set(bonusRevealed, { opacity: 0, y: 10, scale: 0.95 });
-    bonusRevealed.hidden = true;
+    if (bonusCard) {
+      var bonusLocked = bonusCard.querySelector(".bonus-card__locked");
+      var bonusRevealed = bonusCard.querySelector(".bonus-card__revealed");
+      gsap.killTweensOf(bonusCard);
+      gsap.set(bonusLocked, { display: "", opacity: 1, scale: 1 });
+      gsap.set(bonusRevealed, { opacity: 0, y: 10, scale: 0.95 });
+      bonusRevealed.hidden = true;
+    }
 
     enterHallBtn.hidden = true;
     revealBtn.hidden = false;
@@ -262,8 +247,10 @@
   // initial podium entrance animation
   window.addEventListener("DOMContentLoaded", function () {
     initParticleBg();
-    gsap.fromTo(".podium__slot, .bonus-card", { opacity: 0, y: 24 },
+    gsap.fromTo(".podium__slot", { opacity: 0, y: 24 },
       { opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: "power2.out", delay: 0.15 });
+    gsap.fromTo(".credit-footnote", { opacity: 0, y: 12 },
+      { opacity: 0.55, y: 0, duration: 0.6, ease: "power2.out", delay: 0.5 });
     updateActionUI();
   });
 

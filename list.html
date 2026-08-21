@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Submissions · Global AI Venture Studio</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css?v=8">
+<link rel="stylesheet" href="awards.css?v=12">
+<link rel="stylesheet" href="listing.css?v=1">
+</head>
+<body>
+
+<header class="list-header">
+  <div>
+    <a href="index.html" class="back-link">&larr; Back to results</a>
+    <p class="eyebrow">Global AI Venture Studio &middot; Final Showcase</p>
+    <h1>All <span class="brand-teal">Submissions</span></h1>
+    <p class="subtitle">A simple list view of all 20 projects. Use this if the 3D hallway doesn&rsquo;t load for you. <a href="hall.html">Try the 3D hall instead &rarr;</a></p>
+  </div>
+  <div class="list-header__search">
+    <input id="searchInput" type="text" placeholder="Find a project or student&hellip;" aria-label="Search projects">
+  </div>
+</header>
+
+<main class="list-wrap" id="listWrap"></main>
+
+<div id="watchOverlay" class="watch-overlay" hidden></div>
+<div id="watchModal" class="watch-modal" hidden aria-hidden="true">
+  <button id="watchClose" class="watch-modal__close" aria-label="Close">&#10005;</button>
+  <div class="watch-modal__body">
+    <h3 id="watchTitle"></h3>
+    <div class="watch-media">
+      <div class="watch-media__frame">
+        <iframe id="watchVideo" title="Pitch video" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+        <div id="watchVideoPlaceholder" class="media-placeholder" hidden>Video not yet uploaded</div>
+      </div>
+    </div>
+    <a id="watchDeckLink" class="deck-open-link" target="_blank" rel="noopener">&#128196; Open pitch deck &#8599;</a>
+  </div>
+</div>
+
+<script src="data/projects.js?v=4"></script>
+<script src="listing.js?v=1"></script>
+</body>
+</html>

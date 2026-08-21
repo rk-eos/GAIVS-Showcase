@@ -183,60 +183,29 @@ body { overflow: hidden; height: 100vh; }
 .podium__pedestal--1 { height: 64px; background: var(--gold); font-size: 30px; }
 
 /* ---------------------------------------------------------------------------
-   BONUS CARD — academic credit for every participant
+   CREDIT FOOTNOTE — always visible, quietly faded, sits at the very bottom
 --------------------------------------------------------------------------- */
-.bonus-card {
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto 0;
-  background: var(--card-bg);
-  border-radius: var(--radius-md);
-  box-shadow: 0 6px 24px rgba(38,51,59,0.06);
-  padding: 14px 20px;
-  min-height: 60px;
+.credit-footnote {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  max-width: 620px;
+  margin: 18px auto 0;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
 }
-
-.bonus-card__locked {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--meta);
-}
-.bonus-card__badge {
-  font-family: var(--font-mono);
+.credit-footnote:hover { opacity: 0.85; }
+.credit-footnote__logo { width: 20px; height: 20px; flex-shrink: 0; object-fit: contain; }
+.credit-footnote p {
   font-size: 11px;
-  letter-spacing: 0.04em;
-}
-
-.bonus-card__revealed {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  line-height: 1.4;
+  color: var(--meta);
+  margin: 0;
   text-align: left;
 }
-.bonus-card__logo { width: 46px; height: 46px; flex-shrink: 0; object-fit: contain; }
-.bonus-card__revealed h3 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 16px;
-  margin: 0 0 3px;
-  color: var(--ink);
-}
-.bonus-card__revealed p {
-  font-size: 13px;
-  line-height: 1.4;
-  color: var(--body-text);
-  margin: 0;
-  max-width: 60ch;
-}
-.bonus-card__revealed strong { color: var(--teal-hover); }
 
 @media (max-width: 640px) {
-  .bonus-card__revealed { flex-direction: column; text-align: center; gap: 8px; }
+  .credit-footnote { flex-direction: column; text-align: center; }
 }
 
 /* ---------------------------------------------------------------------------
