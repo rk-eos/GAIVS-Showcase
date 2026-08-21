@@ -286,6 +286,11 @@ body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
   text-decoration: none;
 }
 .deck-open-link:hover { background: var(--teal); color: #fff; }
+.deck-open-link--btn {
+  border: none; cursor: pointer; margin-left: 10px;
+  background: var(--tint-gold); color: var(--gold-hover);
+}
+.deck-open-link--btn:hover { background: var(--gold); color: #fff; }
 
 /* ---------------------------------------------------------------------------
    RESPONSIVE

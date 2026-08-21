@@ -724,6 +724,59 @@
     panelVideoPlaceholder.hidden = false;
   });
   var panelDeckLink = document.getElementById("panelDeckLink");
+  var panelSaveCard = document.getElementById("panelSaveCard");
+
+  var cardLogo = new Image();
+  cardLogo.src = "assets/img/gaivs-logo-full.png";
+  panelSaveCard.addEventListener("click", function () {
+    if (currentIndex === null) return;
+    downloadProjectCard(PROJECTS[currentIndex]);
+  });
+
+  function downloadProjectCard(project) {
+    var c = document.createElement("canvas");
+    c.width = 1200; c.height = 630;
+    var ctx = c.getContext("2d");
+    ctx.fillStyle = "#FBFAF7"; ctx.fillRect(0, 0, 1200, 630);
+    ctx.fillStyle = "#37788A"; ctx.fillRect(0, 0, 1200, 14);
+    var logoH = 60, logoW = cardLogo.width ? logoH * (cardLogo.width / cardLogo.height) : 200;
+    if (cardLogo.complete && cardLogo.naturalWidth) ctx.drawImage(cardLogo, 60, 56, logoW, logoH);
+    ctx.fillStyle = "#DFA63E";
+    ctx.font = "700 20px 'Poppins', sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("GLOBAL AI VENTURE STUDIO · SHOWCASE 2026", 60, 156);
+    ctx.fillStyle = "#26333B";
+    ctx.font = "800 52px 'Poppins', sans-serif";
+    wrapText(ctx, project.title, 60, 230, 1080, 60);
+    ctx.fillStyle = "#5F6B72";
+    ctx.font = "20px 'IBM Plex Mono', monospace";
+    ctx.fillText(project.students.join(", "), 60, 320);
+    ctx.fillStyle = "#8A949A";
+    ctx.font = "16px 'IBM Plex Mono', monospace";
+    ctx.fillText("BOOTH " + project.id, 60, 355);
+    ctx.fillStyle = "#37788A"; ctx.fillRect(0, 616, 1200, 14);
+    triggerDownload(c, project.id + "-card.png");
+  }
+
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    var words = text.split(" "), line = "", lines = [];
+    words.forEach(function (w) {
+      var test = (line + " " + w).trim();
+      if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
+      else line = test;
+    });
+    if (line) lines.push(line);
+    lines.slice(0, 2).forEach(function (l, i) { ctx.fillText(l, x, y + i * lineHeight); });
+  }
+
+  function triggerDownload(canvas, filename) {
+    canvas.toBlob(function (blob) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    });
+  }
   var currentIndex = null;
 
   function panelIsOpen() { return !panel.hidden; }
