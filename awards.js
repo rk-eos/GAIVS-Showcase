@@ -72,7 +72,7 @@
   }
 
   var applauseSrc = "assets/audio/applause.mp3";
-  var FADE_OUT_SECONDS = 2;
+  var FADE_OUT_SECONDS = 4;
   var applauseBufferPromise = null;
 
   function loadApplauseBuffer() {
