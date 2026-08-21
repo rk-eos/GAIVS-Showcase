@@ -235,7 +235,7 @@ body { overflow: hidden; height: 100vh; }
 /* ---------------------------------------------------------------------------
    ACTION AREA
 --------------------------------------------------------------------------- */
-.reveal__action { min-height: 40px; display: flex; align-items: center; justify-content: center; margin-top: 12px; }
+.reveal__action { min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 12px; }
 
 .reveal-reset-link {
   display: block;
@@ -300,12 +300,18 @@ body { overflow: hidden; height: 100vh; }
   font-family: var(--font-display); font-weight: 800; font-size: 22px;
   margin: 0 0 18px; padding-right: 30px; color: var(--ink);
 }
-.watch-media__frame { margin-bottom: 18px; }
+.watch-media__frame { margin-bottom: 18px; position: relative; }
 .watch-media__frame iframe {
   width: 100%; border: 1px solid var(--hairline); border-radius: var(--radius-sm);
   background: #000; display: block; aspect-ratio: 16/9;
 }
-.watch-media__frame--deck iframe { background: #fff; aspect-ratio: 16/10; }
+.watch-media__frame--deck iframe { background: #fff; aspect-ratio: 3/2.6; }
+.watch-media__frame .media-placeholder {
+  width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
+  background: var(--surface); border: 1px dashed var(--hairline); border-radius: var(--radius-sm);
+  color: var(--meta); font-family: var(--font-mono); font-size: 12.5px; text-align: center; padding: 12px;
+}
+.watch-media__frame--deck .media-placeholder { aspect-ratio: 3/2.6; }
 
 /* ---------------------------------------------------------------------------
    RESPONSIVE

@@ -275,12 +275,35 @@
   var watchClose = document.getElementById("watchClose");
   var watchTitle = document.getElementById("watchTitle");
   var watchVideo = document.getElementById("watchVideo");
+  var watchVideoPlaceholder = document.getElementById("watchVideoPlaceholder");
   var watchDeck = document.getElementById("watchDeck");
+  var watchDeckPlaceholder = document.getElementById("watchDeckPlaceholder");
 
   function openWatch(project) {
     watchTitle.textContent = project.title;
-    watchVideo.src = project.videoEmbedUrl || project.videoSrc || "";
-    watchDeck.src = project.deckEmbedUrl || project.deckSrc || "";
+    var videoUrl = project.videoEmbedUrl || project.videoSrc || "";
+    var deckUrl = project.deckEmbedUrl || project.deckSrc || "";
+
+    if (videoUrl) {
+      watchVideo.hidden = false;
+      watchVideoPlaceholder.hidden = true;
+      watchVideo.src = videoUrl;
+    } else {
+      watchVideo.hidden = true;
+      watchVideo.removeAttribute("src");
+      watchVideoPlaceholder.hidden = false;
+    }
+
+    if (deckUrl) {
+      watchDeck.hidden = false;
+      watchDeckPlaceholder.hidden = true;
+      watchDeck.src = deckUrl;
+    } else {
+      watchDeck.hidden = true;
+      watchDeck.removeAttribute("src");
+      watchDeckPlaceholder.hidden = false;
+    }
+
     watchOverlay.hidden = false;
     watchModal.hidden = false;
     gsap.fromTo(watchModal, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.25, ease: "power2.out" });
@@ -293,8 +316,8 @@
       onComplete: function () {
         watchOverlay.hidden = true;
         watchModal.hidden = true;
-        watchVideo.src = "";
-        watchDeck.src = "";
+        watchVideo.removeAttribute("src");
+        watchDeck.removeAttribute("src");
       },
     });
   }

@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=18">
+<link rel="stylesheet" href="style.css?v=19">
 </head>
 <body>
 
@@ -20,7 +20,7 @@
     <a href="index.html" class="back-link">&larr; Back to results</a>
     <p class="eyebrow">Global AI Venture Studio &middot; Final Showcase</p>
     <h1>Project <span class="brand-teal">Showcase</span></h1>
-    <p class="subtitle">Walk the hall. Click any booth to watch the pitch and read the deck.</p>
+    <p class="subtitle">Walk the hall. Click any booth to watch the pitch and read the deck. Scroll, drag the bar below, or use the &larr; &rarr; arrows to move — click the podium at the end to see the winners.</p>
     <p class="hall-note">Booths are numbered for wayfinding only — this order isn't a ranking.</p>
   </div>
   <div class="hall-header__controls">
@@ -71,6 +71,7 @@
         <h3 class="panel__media-label">Pitch video</h3>
         <div class="media-frame media-frame--video">
           <video id="panelVideo" controls preload="metadata"></video>
+          <div id="panelVideoPlaceholder" class="media-placeholder" hidden>Video not yet uploaded</div>
         </div>
       </div>
 
@@ -78,6 +79,7 @@
         <h3 class="panel__media-label">Pitch deck</h3>
         <div class="media-frame media-frame--deck">
           <iframe id="panelDeck" title="Pitch deck viewer"></iframe>
+          <div id="panelDeckPlaceholder" class="media-placeholder" hidden>Deck not yet uploaded</div>
           <a id="panelDeckFallback" class="deck-fallback-link" target="_blank" rel="noopener">Open deck in new tab &#8599;</a>
         </div>
       </div>
@@ -88,6 +90,6 @@
 <script src="data/projects.js?v=4"></script>
 <script src="data/winners.js?v=1"></script>
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script src="script.js?v=18"></script>
+<script src="script.js?v=19"></script>
 </body>
 </html>

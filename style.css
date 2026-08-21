@@ -252,13 +252,19 @@ body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
 .panel__media-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--meta); margin: 0 0 8px; }
 
-.media-frame { margin-bottom: 0; }
+.media-frame { margin-bottom: 0; position: relative; }
 .media-frame--video video { width: 100%; border-radius: var(--radius-sm); background: #000; display: block; aspect-ratio: 16 / 9; }
 
 .media-frame--deck iframe {
-  width: 100%; aspect-ratio: 4 / 3; border: 1px solid var(--hairline);
+  width: 100%; aspect-ratio: 3 / 2.6; border: 1px solid var(--hairline);
   border-radius: var(--radius-sm); background: #fff; display: block;
 }
+.media-placeholder {
+  width: 100%; aspect-ratio: 3 / 2.6; display: flex; align-items: center; justify-content: center;
+  background: var(--surface); border: 1px dashed var(--hairline); border-radius: var(--radius-sm);
+  color: var(--meta); font-family: var(--font-mono); font-size: 12.5px; text-align: center; padding: 12px;
+}
+.media-frame--video .media-placeholder { aspect-ratio: 16 / 9; }
 .deck-fallback-link { display: inline-block; margin-top: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--teal); }
 .deck-fallback-link:hover { color: var(--teal-hover); }
 

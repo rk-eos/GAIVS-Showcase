@@ -666,7 +666,9 @@
   var panelStudents = document.getElementById("panelStudents");
   var panelBlurb = document.getElementById("panelBlurb");
   var panelVideo = document.getElementById("panelVideo");
+  var panelVideoPlaceholder = document.getElementById("panelVideoPlaceholder");
   var panelDeck = document.getElementById("panelDeck");
+  var panelDeckPlaceholder = document.getElementById("panelDeckPlaceholder");
   var panelDeckFallback = document.getElementById("panelDeckFallback");
   var currentIndex = null;
 
@@ -681,9 +683,31 @@
     panelStudents.textContent = project.students.join(", ");
     panelBlurb.textContent = project.blurb;
 
-    panelVideo.src = project.videoSrc;
-    panelDeck.src = project.deckSrc;
-    panelDeckFallback.href = project.deckSrc;
+    var hasVideo = !!project.videoSrc;
+    var hasDeck = !!project.deckSrc;
+
+    if (hasVideo) {
+      panelVideo.hidden = false;
+      panelVideoPlaceholder.hidden = true;
+      panelVideo.src = project.videoSrc;
+    } else {
+      panelVideo.hidden = true;
+      panelVideo.removeAttribute("src");
+      panelVideoPlaceholder.hidden = false;
+    }
+
+    if (hasDeck) {
+      panelDeck.hidden = false;
+      panelDeckPlaceholder.hidden = true;
+      panelDeck.src = project.deckSrc;
+      panelDeckFallback.href = project.deckSrc;
+      panelDeckFallback.style.display = "inline-block";
+    } else {
+      panelDeck.hidden = true;
+      panelDeck.removeAttribute("src");
+      panelDeckPlaceholder.hidden = false;
+      panelDeckFallback.style.display = "none";
+    }
 
     overlay.hidden = false;
     panel.hidden = false;
