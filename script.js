@@ -542,8 +542,39 @@
     hint.classList.add("is-hidden");
   });
 
-  walkForward.addEventListener("click", function () { setProgress(targetProgress + 0.08); hint.classList.add("is-hidden"); });
-  walkBack.addEventListener("click", function () { setProgress(targetProgress - 0.08); hint.classList.add("is-hidden"); });
+  walkForward.addEventListener("click", function () { stopAutoWalk(); setProgress(targetProgress + 0.08); hint.classList.add("is-hidden"); });
+  walkBack.addEventListener("click", function () { stopAutoWalk(); setProgress(targetProgress - 0.08); hint.classList.add("is-hidden"); });
+
+  var autoWalkBtn = document.getElementById("autoWalkBtn");
+  var autoWalking = false;
+  var AUTO_WALK_SECONDS = 45;
+  var autoWalkStartTime = 0;
+  var autoWalkStartProgress = 0;
+
+  function startAutoWalk() {
+    autoWalking = true;
+    autoWalkStartTime = performance.now();
+    autoWalkStartProgress = targetProgress;
+    autoWalkBtn.innerHTML = "&#10074;&#10074;";
+    autoWalkBtn.setAttribute("aria-label", "Pause walkthrough");
+    hint.classList.add("is-hidden");
+  }
+  function stopAutoWalk() {
+    if (!autoWalking) return;
+    autoWalking = false;
+    autoWalkBtn.innerHTML = "&#9654;";
+    autoWalkBtn.setAttribute("aria-label", "Play walkthrough");
+  }
+  autoWalkBtn.addEventListener("click", function () {
+    if (autoWalking) stopAutoWalk();
+    else startAutoWalk();
+  });
+  ["wheel", "touchstart", "keydown"].forEach(function (evt) {
+    (evt === "keydown" ? document : canvas).addEventListener(evt, function (e) {
+      if (autoWalking && (evt !== "keydown" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown")) stopAutoWalk();
+    });
+  });
+  slider.addEventListener("pointerdown", stopAutoWalk);
 
   canvas.addEventListener("wheel", function (e) {
     e.preventDefault();
@@ -605,6 +636,14 @@
   function animate() {
     requestAnimationFrame(animate);
 
+    if (autoWalking) {
+      var elapsed = (performance.now() - autoWalkStartTime) / 1000;
+      var p = autoWalkStartProgress + elapsed / AUTO_WALK_SECONDS;
+      if (p >= 1) { p = 1; stopAutoWalk(); }
+      targetProgress = p;
+      slider.value = Math.round(p * 1000);
+      updateCounter();
+    }
     var targetZ = progressToZ(targetProgress);
     camera.position.z += (targetZ - camera.position.z) * 0.08;
 
