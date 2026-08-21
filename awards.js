@@ -73,24 +73,37 @@
 
   var applauseSrc = "assets/audio/applause.mp3";
   var FADE_OUT_SECONDS = 2;
+  var applauseBufferPromise = null;
+
+  function loadApplauseBuffer() {
+    var ctx = getAudioCtx();
+    if (!ctx) return Promise.reject(new Error("no audio context"));
+    if (!applauseBufferPromise) {
+      applauseBufferPromise = fetch(applauseSrc)
+        .then(function (r) { return r.arrayBuffer(); })
+        .then(function (buf) { return ctx.decodeAudioData(buf); });
+    }
+    return applauseBufferPromise;
+  }
+
   function playApplause(intensity) {
     intensity = intensity || 1;
     var baseVolume = Math.min(1, 0.75 * intensity);
-    var el = new Audio(applauseSrc);
-    el.volume = baseVolume;
-    el.play().catch(function () { /* autoplay-policy edge cases — ignore */ });
-
-    function tick() {
-      if (el.ended) return;
-      if (el.duration) {
-        var remaining = el.duration - el.currentTime;
-        if (remaining < FADE_OUT_SECONDS) {
-          el.volume = Math.max(0, baseVolume * (remaining / FADE_OUT_SECONDS));
-        }
-      }
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
+    loadApplauseBuffer().then(function (buffer) {
+      var ctx = getAudioCtx();
+      var source = ctx.createBufferSource();
+      source.buffer = buffer;
+      var gain = ctx.createGain();
+      var now = ctx.currentTime;
+      var dur = buffer.duration;
+      var fadeStart = Math.max(0, dur - FADE_OUT_SECONDS);
+      gain.gain.setValueAtTime(baseVolume, now);
+      gain.gain.setValueAtTime(baseVolume, now + fadeStart);
+      gain.gain.linearRampToValueAtTime(0.0001, now + dur);
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      source.start(now);
+    }).catch(function () { /* autoplay-policy or decode edge cases — ignore */ });
   }
 
   function playSparkle() {
