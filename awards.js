@@ -72,10 +72,19 @@
   }
 
   var applauseSrc = "assets/audio/applause.mp3";
+  var FADE_OUT_SECONDS = 1.4;
   function playApplause(intensity) {
     intensity = intensity || 1;
+    var baseVolume = Math.min(1, 0.75 * intensity);
     var el = new Audio(applauseSrc);
-    el.volume = Math.min(1, 0.75 * intensity);
+    el.volume = baseVolume;
+    el.addEventListener("timeupdate", function () {
+      if (!el.duration) return;
+      var remaining = el.duration - el.currentTime;
+      if (remaining < FADE_OUT_SECONDS) {
+        el.volume = Math.max(0, baseVolume * (remaining / FADE_OUT_SECONDS));
+      }
+    });
     el.play().catch(function () { /* autoplay-policy edge cases — ignore */ });
   }
 
