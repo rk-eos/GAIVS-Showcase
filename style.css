@@ -257,6 +257,7 @@ body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
   background: var(--surface); border: 1px dashed var(--hairline); border-radius: var(--radius-sm);
   color: var(--meta); font-family: var(--font-mono); font-size: 12.5px; text-align: center; padding: 12px;
 }
+.media-placeholder[hidden] { display: none; }
 
 .deck-open-link {
   display: inline-flex;

@@ -264,16 +264,19 @@
   var watchVideo = document.getElementById("watchVideo");
   var watchVideoPlaceholder = document.getElementById("watchVideoPlaceholder");
   var watchDeckLink = document.getElementById("watchDeckLink");
+  watchVideo.addEventListener("error", function () {
+    watchVideo.hidden = true;
+    watchVideoPlaceholder.hidden = false;
+  });
 
   function openWatch(project) {
     watchTitle.textContent = project.title;
-    var videoUrl = project.videoEmbedUrl || project.videoSrc || "";
-    var deckUrl = project.deckEmbedUrl || project.deckSrc || "";
+    var deckUrl = project.deckSrc || "";
 
-    if (videoUrl) {
+    if (project.videoSrc) {
       watchVideo.hidden = false;
       watchVideoPlaceholder.hidden = true;
-      watchVideo.src = videoUrl;
+      watchVideo.src = project.videoSrc;
     } else {
       watchVideo.hidden = true;
       watchVideo.removeAttribute("src");
@@ -299,7 +302,9 @@
       onComplete: function () {
         watchOverlay.hidden = true;
         watchModal.hidden = true;
+        watchVideo.pause();
         watchVideo.removeAttribute("src");
+        watchVideo.load();
       },
     });
   }

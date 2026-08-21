@@ -290,7 +290,7 @@ body { overflow: hidden; height: 100vh; }
   margin: 0 0 18px; padding-right: 30px; color: var(--ink);
 }
 .watch-media__frame { margin-bottom: 0; position: relative; }
-.watch-media__frame iframe {
+.watch-media__frame video {
   width: 100%; border: 1px solid var(--hairline); border-radius: var(--radius-sm);
   background: #000; display: block; aspect-ratio: 16/9;
 }
@@ -299,6 +299,7 @@ body { overflow: hidden; height: 100vh; }
   background: var(--surface); border: 1px dashed var(--hairline); border-radius: var(--radius-sm);
   color: var(--meta); font-family: var(--font-mono); font-size: 12.5px; text-align: center; padding: 12px;
 }
+.watch-media__frame .media-placeholder[hidden] { display: none; }
 .deck-open-link {
   display: inline-flex;
   align-items: center;

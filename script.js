@@ -667,6 +667,10 @@
   var panelBlurb = document.getElementById("panelBlurb");
   var panelVideo = document.getElementById("panelVideo");
   var panelVideoPlaceholder = document.getElementById("panelVideoPlaceholder");
+  panelVideo.addEventListener("error", function () {
+    panelVideo.hidden = true;
+    panelVideoPlaceholder.hidden = false;
+  });
   var panelDeckLink = document.getElementById("panelDeckLink");
   var currentIndex = null;
 

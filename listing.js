@@ -52,6 +52,10 @@
   var watchVideo = document.getElementById("watchVideo");
   var watchVideoPlaceholder = document.getElementById("watchVideoPlaceholder");
   var watchDeckLink = document.getElementById("watchDeckLink");
+  watchVideo.addEventListener("error", function () {
+    watchVideo.hidden = true;
+    watchVideoPlaceholder.hidden = false;
+  });
 
   function openWatch(project) {
     watchTitle.textContent = project.title;
@@ -79,7 +83,9 @@
     watchOverlay.hidden = true;
     watchModal.hidden = true;
     watchModal.setAttribute("aria-hidden", "true");
+    watchVideo.pause();
     watchVideo.removeAttribute("src");
+    watchVideo.load();
   }
 
   watchOverlay.addEventListener("click", closeWatch);
