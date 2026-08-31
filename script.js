@@ -633,7 +633,8 @@
     new THREE.PlaneGeometry(6, 2.25),
     toonMaterial(0xffffff, { map: bannerTexture })
   );
-  banner.position.set(0, 3.8, END_WALL_Z - 0.83);
+  // high enough that the bobbing winner cards and medals never cover it
+  banner.position.set(0, 5.6, END_WALL_Z - 0.83);
   scene.add(banner);
 
   var logoImg = new Image();
