@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=30">
+<link rel="stylesheet" href="style.css?v=31">
 <link rel="stylesheet" href="present.css?v=1">
 </head>
 <body>
@@ -73,6 +73,7 @@
   </div>
 
   <div class="panel__body">
+    <div class="panel__info">
     <h2 id="panelTitle"></h2>
     <p class="panel__students" id="panelStudents"></p>
     <p class="panel__blurb" id="panelBlurb"></p>
@@ -85,7 +86,9 @@
       <h3 class="panel__media-label">Founder commitment</h3>
       <p class="panel__blurb" id="panelCommitment"></p>
     </div>
+    </div>
 
+    <div class="panel__side">
     <div class="panel__media">
       <div class="media-col">
         <h3 class="panel__media-label">Pitch video</h3>
@@ -99,12 +102,13 @@
     </div>
     <a id="panelDeckLink" class="deck-open-link" target="_blank" rel="noopener">&#128196; Open pitch deck &#8599;</a>
     <a id="panelPrototypeLink" class="deck-open-link" target="_blank" rel="noopener">&#128295; Try the prototype &#8599;</a>
+    </div>
   </div>
 </aside>
 
 <script src="data/winners.js?v=5"></script>
 <script src="vendor/three-0.160.0.min.js"></script>
-<script src="gate.js?v=3" data-scripts="safeurl.js?v=1,script.js?v=37"></script>
+<script src="gate.js?v=3" data-scripts="safeurl.js?v=1,script.js?v=38"></script>
 <script src="present.js?v=1"></script>
 </body>
 </html>

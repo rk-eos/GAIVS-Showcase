@@ -499,13 +499,16 @@
     if (isFirst) tl.call(playFinale, null, "-=0.3");
   }
 
+  var skipToHallLink = document.getElementById("skipToHallLink");
   function updateActionUI() {
     if (stepIndex >= sequence.length) {
       revealBtn.hidden = true;
       enterHallBtn.hidden = false;
+      if (skipToHallLink) skipToHallLink.hidden = true; // redundant once the big button shows
       gsap.fromTo(enterHallBtn, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 });
       return;
     }
+    if (skipToHallLink) skipToHallLink.hidden = false;
     var labels = { 3: "Reveal 3rd Place", 2: "Reveal 2nd Place", 1: "Reveal 1st Place \uD83C\uDFC6" };
     revealBtn.textContent = labels[sequence[stepIndex]];
   }
