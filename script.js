@@ -336,6 +336,7 @@
 
   var camera = new THREE.PerspectiveCamera(62, 1, 0.1, 200);
   var EYE_HEIGHT = 1.6;
+  camera.rotation.order = "YXZ";
   camera.position.set(0, EYE_HEIGHT, START_Z);
 
   function resize() {
@@ -884,14 +885,67 @@
   });
   slider.addEventListener("pointerdown", stopAutoWalk);
 
+  // ---------------------------------------------------------------------------
+  // FREE WALK — pointer-lock first person: WASD/arrows move, mouse looks,
+  // Esc (or the WASD button) returns to the scroll/slider view.
+  // ---------------------------------------------------------------------------
+  var freeWalkBtn = document.getElementById("freeWalkBtn");
+  var crosshair = document.getElementById("walkCrosshair");
+  var freeWalking = false;
+  var fwYaw = 0, fwPitch = 0;
+  var fwKeys = {};
+  var fwLastFrame = 0;
+  var FW_SPEED = 4.4;
+  var FW_X_LIMIT = 2.55;
+  var FW_Z_MIN = END_Z + 0.4;
+
+  function fwLocked() { return document.pointerLockElement === canvas; }
+
+  document.addEventListener("pointerlockchange", function () {
+    freeWalking = fwLocked();
+    if (crosshair) crosshair.hidden = !freeWalking;
+    if (freeWalkBtn) freeWalkBtn.classList.toggle("is-active", freeWalking);
+    if (freeWalking) {
+      stopAutoWalk();
+      fwYaw = 0; fwPitch = 0; fwKeys = {};
+      fwLastFrame = performance.now();
+      hint.classList.add("is-hidden");
+    } else {
+      fwKeys = {};
+      camera.rotation.x = 0;
+      camera.rotation.y = 0;
+      camera.position.x = Math.max(-1, Math.min(1, camera.position.x));
+      // hand the position back to the slider system
+      setProgress((camera.position.z - START_Z) / (END_Z - START_Z));
+    }
+  });
+
+  if (freeWalkBtn) freeWalkBtn.addEventListener("click", function () {
+    if (freeWalking) { document.exitPointerLock(); return; }
+    stopAutoWalk();
+    if (canvas.requestPointerLock) canvas.requestPointerLock();
+  });
+
+  document.addEventListener("mousemove", function (e) {
+    if (!freeWalking) return;
+    fwYaw -= e.movementX * 0.0022;
+    fwPitch -= e.movementY * 0.0018;
+    var lim = 0.6;
+    if (fwPitch > lim) fwPitch = lim;
+    if (fwPitch < -lim) fwPitch = -lim;
+  });
+  document.addEventListener("keydown", function (e) { if (freeWalking) fwKeys[e.code] = true; });
+  document.addEventListener("keyup", function (e) { fwKeys[e.code] = false; });
+
   canvas.addEventListener("wheel", function (e) {
     e.preventDefault();
+    if (freeWalking) return;
     setProgress(targetProgress + e.deltaY * 0.0006);
     hint.classList.add("is-hidden");
   }, { passive: false });
 
   document.addEventListener("keydown", function (e) {
-    if (!panelIsOpen()) {
+    if (!panelIsOpen() && !freeWalking) {
       if (e.key === "ArrowRight" || e.key === "ArrowDown") { setProgress(targetProgress + 0.05); hint.classList.add("is-hidden"); }
       if (e.key === "ArrowLeft" || e.key === "ArrowUp") { setProgress(targetProgress - 0.05); hint.classList.add("is-hidden"); }
     }
@@ -977,22 +1031,40 @@
         updateCounter();
       }
     }
-    var targetZ = progressToZ(targetProgress);
-    camera.position.z += (targetZ - camera.position.z) * 0.08;
+    var moving;
+    if (freeWalking) {
+      var fdt = Math.min(0.05, Math.max(0, (now - fwLastFrame) / 1000));
+      fwLastFrame = now;
+      var fwd = (fwKeys.KeyW || fwKeys.ArrowUp ? 1 : 0) - (fwKeys.KeyS || fwKeys.ArrowDown ? 1 : 0);
+      var strafe = (fwKeys.KeyD || fwKeys.ArrowRight ? 1 : 0) - (fwKeys.KeyA || fwKeys.ArrowLeft ? 1 : 0);
+      var sinY = Math.sin(fwYaw), cosY = Math.cos(fwYaw);
+      camera.position.x += (-sinY * fwd + cosY * strafe) * FW_SPEED * fdt;
+      camera.position.z += (-cosY * fwd - sinY * strafe) * FW_SPEED * fdt;
+      camera.position.x = Math.max(-FW_X_LIMIT, Math.min(FW_X_LIMIT, camera.position.x));
+      camera.position.z = Math.max(FW_Z_MIN, Math.min(START_Z, camera.position.z));
+      camera.rotation.y = fwYaw;
+      camera.rotation.x = fwPitch;
+      moving = fwd !== 0 || strafe !== 0;
+      camera.position.y = EYE_HEIGHT + (moving ? Math.sin(now * 0.012) * 0.035 : 0);
+    } else {
+      var targetZ = progressToZ(targetProgress);
+      camera.position.z += (targetZ - camera.position.z) * 0.08;
 
-    var targetSwayX = mouseNormX * 0.5;
-    var targetYaw = 0;
-    if (autoWalking) {
-      var swayPhase = (autoWalkSway / SWAY_PERIOD) * Math.PI * 2;
-      targetSwayX += Math.sin(swayPhase) * SWAY_AMPLITUDE;
-      targetYaw = -Math.sin(swayPhase + 0.6) * SWAY_YAW;
+      var targetSwayX = mouseNormX * 0.5;
+      var targetYaw = 0;
+      if (autoWalking) {
+        var swayPhase = (autoWalkSway / SWAY_PERIOD) * Math.PI * 2;
+        targetSwayX += Math.sin(swayPhase) * SWAY_AMPLITUDE;
+        targetYaw = -Math.sin(swayPhase + 0.6) * SWAY_YAW;
+      }
+      camera.position.x += (targetSwayX - camera.position.x) * 0.06;
+      camera.rotation.y += (targetYaw - camera.rotation.y) * 0.04;
+      if (camera.rotation.x !== 0) camera.rotation.x *= 0.9;
+
+      moving = Math.abs(targetZ - camera.position.z) > 0.02;
+      var bob = moving ? Math.sin(performance.now() * 0.008) * 0.025 : 0;
+      camera.position.y = EYE_HEIGHT + bob;
     }
-    camera.position.x += (targetSwayX - camera.position.x) * 0.06;
-    camera.rotation.y += (targetYaw - camera.rotation.y) * 0.04;
-
-    var moving = Math.abs(targetZ - camera.position.z) > 0.02;
-    var bob = moving ? Math.sin(performance.now() * 0.008) * 0.025 : 0;
-    camera.position.y = EYE_HEIGHT + bob;
 
     clickableMeshes.forEach(function (m) {
       if (m.userData.flash > 0) {
@@ -1051,14 +1123,22 @@
   // ===========================================================================
   var raycaster = new THREE.Raycaster();
   canvas.addEventListener("click", function (e) {
-    var rect = canvas.getBoundingClientRect();
-    var ndc = new THREE.Vector2(
-      ((e.clientX - rect.left) / rect.width) * 2 - 1,
-      -((e.clientY - rect.top) / rect.height) * 2 + 1
-    );
+    var ndc;
+    if (freeWalking) {
+      ndc = new THREE.Vector2(0, 0); // crosshair = screen centre
+    } else {
+      var rect = canvas.getBoundingClientRect();
+      ndc = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
+      );
+    }
     raycaster.setFromCamera(ndc, camera);
     var hits = raycaster.intersectObjects(clickableMeshes);
-    if (hits.length) openPanel(hits[0].object.userData.projectIndex);
+    if (hits.length) {
+      if (freeWalking) document.exitPointerLock();
+      openPanel(hits[0].object.userData.projectIndex);
+    }
   });
 
   // ===========================================================================
