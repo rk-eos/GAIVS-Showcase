@@ -354,3 +354,14 @@ body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
   box-shadow: 0 3px 12px rgba(223,166,62,0.35);
 }
 .deck-open-link--video:hover { background: var(--gold-hover); color: #fff; }
+
+.panel__poster {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--hairline);
+  margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(38,51,59,0.10);
+}
+.panel__poster[hidden] { display: none; }
