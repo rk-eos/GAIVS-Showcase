@@ -205,6 +205,14 @@ body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 .walk-btn--play:hover { background: var(--gold-hover); color: #fff; border-color: var(--gold-hover); }
 .walk-btn--wasd { width: auto; padding: 0 14px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; }
 .walk-btn--wasd.is-active { background: var(--teal); color: #fff; border-color: var(--teal); }
+.freewalk-hint {
+  position: absolute; left: 50%; bottom: 74px; transform: translateX(-50%);
+  background: rgba(38,51,59,0.78); color: #fff; padding: 8px 18px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 12px; z-index: 6; pointer-events: none;
+  white-space: nowrap;
+}
+.freewalk-hint strong { color: var(--gold); font-weight: 600; }
+.freewalk-hint[hidden] { display: none; }
 .walk-crosshair {
   position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; border-radius: 50%;
   background: rgba(255,255,255,0.95); box-shadow: 0 0 0 2px rgba(38,51,59,0.35), 0 0 8px rgba(38,51,59,0.4);

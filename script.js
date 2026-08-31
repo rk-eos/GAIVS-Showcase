@@ -973,6 +973,12 @@
     fwLastFrame = performance.now();
     if (crosshair) crosshair.hidden = false;
     if (freeWalkBtn) freeWalkBtn.classList.add("is-active");
+    var fwHint = document.getElementById("freeWalkHint");
+    if (fwHint) {
+      fwHint.hidden = false;
+      clearTimeout(fwHint.__t);
+      fwHint.__t = setTimeout(function () { fwHint.hidden = true; }, 6000);
+    }
     hint.classList.add("is-hidden");
   }
   function deactivateFreeWalk() {
@@ -981,6 +987,8 @@
     fwKeys = {};
     if (crosshair) crosshair.hidden = true;
     if (freeWalkBtn) freeWalkBtn.classList.remove("is-active");
+    var fwHint2 = document.getElementById("freeWalkHint");
+    if (fwHint2) { clearTimeout(fwHint2.__t); fwHint2.hidden = true; }
     camera.rotation.x = 0;
     camera.rotation.y = 0;
     camera.position.x = Math.max(-1, Math.min(1, camera.position.x));
