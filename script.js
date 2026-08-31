@@ -1317,7 +1317,6 @@
     } else if (v.type === "iframe") {
       panelVideoFrame.hidden = false; panelVideoFrame.src = sanUrl(v.url);
     } else if (v.type === "external") {
-      panelVideoPlaceholder.hidden = false;
       panelVideoExternalLink.hidden = false;
       panelVideoExternalLink.href = sanUrl(v.url);
     } else {

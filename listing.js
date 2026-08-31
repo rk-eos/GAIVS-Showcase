@@ -151,7 +151,6 @@
     } else if (v.type === "iframe" && vUrl) {
       watchVideoFrame.hidden = false; watchVideoFrame.src = vUrl;
     } else if (v.type === "external" && vUrl) {
-      watchVideoPlaceholder.hidden = false;
       watchVideoExternalLink.hidden = false;
       watchVideoExternalLink.href = vUrl;
     } else {

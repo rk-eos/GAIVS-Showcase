@@ -649,7 +649,6 @@
     } else if (v.type === "iframe") {
       watchVideoFrame.hidden = false; watchVideoFrame.src = sanUrl(v.url);
     } else if (v.type === "external") {
-      watchVideoPlaceholder.hidden = false;
       watchVideoExternalLink.hidden = false;
       watchVideoExternalLink.href = sanUrl(v.url);
     } else {
