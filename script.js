@@ -305,25 +305,11 @@
     return rim;
   }
 
-  // shared translucent cone material for the volumetric-looking spotlights
-  var spotConeMat = new THREE.MeshBasicMaterial({
-    color: 0xffe2ac, transparent: true, opacity: 0.085, depthWrite: false,
-    blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-  });
-  spotConeMat.fog = false;
-  var SPOT_TOP_Y = 6.4;      // where the cone's apex hangs
+  // winner glory lighting: no visible cone geometry (it read as light coming
+  // from nowhere) — just a warm pool on the floor, as if cast by the pendants
   var SPOT_BASE_R = 1.7;     // pool radius on the floor
-  var SPOT_POOL_OPACITY = 0.11;
-  var spotConeGeo = null;
+  var SPOT_POOL_OPACITY = 0.16;
   function addSpotlight(x, z) {
-    if (!spotConeGeo) {
-      spotConeGeo = new THREE.ConeGeometry(SPOT_BASE_R, SPOT_TOP_Y, 20, 1, true);
-      spotConeGeo.translate(0, SPOT_TOP_Y / 2, 0);
-    }
-    var cone = new THREE.Mesh(spotConeGeo, spotConeMat);
-    cone.position.set(x, 0.02, z);
-    scene.add(cone);
-
     var pool = new THREE.Mesh(
       new THREE.CircleGeometry(SPOT_BASE_R, 24),
       new THREE.MeshBasicMaterial({
@@ -334,7 +320,7 @@
     pool.rotation.x = -Math.PI / 2;
     pool.position.set(x, 0.02, z);
     scene.add(pool);
-    return cone;
+    return pool;
   }
 
   // ===========================================================================
@@ -717,7 +703,7 @@
         m.material.emissiveIntensity = WINNER_EMISSIVE_INTENSITY;
       });
 
-      var medalMat = new THREE.SpriteMaterial({ map: makeMedalTexture(place), transparent: true });
+      var medalMat = new THREE.SpriteMaterial({ map: makeMedalTexture(place), transparent: true, alphaTest: 0.5, depthWrite: false });
       medalMat.fog = false;
       var medal = new THREE.Sprite(medalMat);
       medal.scale.set(0.72, 0.72, 1);
@@ -790,7 +776,7 @@
       addGoldRim(block, 1.09);
       addSpotlight(spec.x, podiumZ);
 
-      var medalMat = new THREE.SpriteMaterial({ map: makeMedalTexture(winner.place), transparent: true });
+      var medalMat = new THREE.SpriteMaterial({ map: makeMedalTexture(winner.place), transparent: true, alphaTest: 0.5, depthWrite: false });
       medalMat.fog = false;
       var medal = new THREE.Sprite(medalMat);
       medal.scale.set(0.8, 0.8, 1);
