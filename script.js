@@ -899,42 +899,75 @@
   var FW_X_LIMIT = 2.55;
   var FW_Z_MIN = END_Z + 0.4;
 
+  var fwFallback = false;    // pointer lock unavailable: drag on the canvas to look
+  var fwDragDist = 0;
   function fwLocked() { return document.pointerLockElement === canvas; }
 
+  function activateFreeWalk(fallback) {
+    freeWalking = true;
+    fwFallback = fallback;
+    stopAutoWalk();
+    fwYaw = 0; fwPitch = 0; fwKeys = {};
+    fwLastFrame = performance.now();
+    if (crosshair) crosshair.hidden = false;
+    if (freeWalkBtn) freeWalkBtn.classList.add("is-active");
+    hint.classList.add("is-hidden");
+  }
+  function deactivateFreeWalk() {
+    freeWalking = false;
+    fwFallback = false;
+    fwKeys = {};
+    if (crosshair) crosshair.hidden = true;
+    if (freeWalkBtn) freeWalkBtn.classList.remove("is-active");
+    camera.rotation.x = 0;
+    camera.rotation.y = 0;
+    camera.position.x = Math.max(-1, Math.min(1, camera.position.x));
+    // hand the position back to the slider system
+    setProgress((camera.position.z - START_Z) / (END_Z - START_Z));
+  }
+  function exitFreeWalk() {
+    if (fwLocked()) document.exitPointerLock();
+    else if (freeWalking) deactivateFreeWalk();
+  }
+
   document.addEventListener("pointerlockchange", function () {
-    freeWalking = fwLocked();
-    if (crosshair) crosshair.hidden = !freeWalking;
-    if (freeWalkBtn) freeWalkBtn.classList.toggle("is-active", freeWalking);
-    if (freeWalking) {
-      stopAutoWalk();
-      fwYaw = 0; fwPitch = 0; fwKeys = {};
-      fwLastFrame = performance.now();
-      hint.classList.add("is-hidden");
-    } else {
-      fwKeys = {};
-      camera.rotation.x = 0;
-      camera.rotation.y = 0;
-      camera.position.x = Math.max(-1, Math.min(1, camera.position.x));
-      // hand the position back to the slider system
-      setProgress((camera.position.z - START_Z) / (END_Z - START_Z));
-    }
+    if (fwLocked()) activateFreeWalk(false);
+    else if (freeWalking && !fwFallback) deactivateFreeWalk();
+  });
+  document.addEventListener("pointerlockerror", function () {
+    // pane/iframe blocked pointer lock — fall back to drag-to-look
+    if (!freeWalking) activateFreeWalk(true);
   });
 
   if (freeWalkBtn) freeWalkBtn.addEventListener("click", function () {
-    if (freeWalking) { document.exitPointerLock(); return; }
+    if (freeWalking) { exitFreeWalk(); return; }
     stopAutoWalk();
-    if (canvas.requestPointerLock) canvas.requestPointerLock();
+    if (canvas.requestPointerLock) {
+      try { canvas.requestPointerLock(); } catch (e) { activateFreeWalk(true); }
+    } else {
+      activateFreeWalk(true);
+    }
   });
 
   document.addEventListener("mousemove", function (e) {
     if (!freeWalking) return;
+    // locked: every movement looks. fallback: only while dragging on the canvas.
+    if (!fwLocked()) {
+      if (e.buttons !== 1 || (e.target !== canvas && !canvas.contains(e.target))) return;
+      fwDragDist += Math.abs(e.movementX) + Math.abs(e.movementY);
+    }
     fwYaw -= e.movementX * 0.0022;
     fwPitch -= e.movementY * 0.0018;
     var lim = 0.6;
     if (fwPitch > lim) fwPitch = lim;
     if (fwPitch < -lim) fwPitch = -lim;
   });
-  document.addEventListener("keydown", function (e) { if (freeWalking) fwKeys[e.code] = true; });
+  canvas.addEventListener("mousedown", function () { fwDragDist = 0; });
+  document.addEventListener("keydown", function (e) {
+    if (!freeWalking) return;
+    fwKeys[e.code] = true;
+    if (e.code === "Escape" && fwFallback) exitFreeWalk();
+  });
   document.addEventListener("keyup", function (e) { fwKeys[e.code] = false; });
 
   canvas.addEventListener("wheel", function (e) {
@@ -1124,7 +1157,8 @@
   var raycaster = new THREE.Raycaster();
   canvas.addEventListener("click", function (e) {
     var ndc;
-    if (freeWalking) {
+    if (freeWalking && fwFallback && fwDragDist > 8) { fwDragDist = 0; return; }
+    if (freeWalking && fwLocked()) {
       ndc = new THREE.Vector2(0, 0); // crosshair = screen centre
     } else {
       var rect = canvas.getBoundingClientRect();
