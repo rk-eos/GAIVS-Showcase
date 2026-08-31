@@ -97,12 +97,12 @@
     '#gateOverlay button:hover{background:#C8922F;}' +
     '#gateOverlay button[disabled]{cursor:default;opacity:0.72;background:#C8922F;}' +
     '#gateOverlay .gate-error{color:#8E2E4D;min-height:18px;margin:10px 0 0;}' +
-    '#gateOverlay .gate-door{position:absolute;top:0;bottom:0;width:50.5%;background:#FBFAF7;z-index:3;display:none;will-change:transform;}' +
-    '#gateOverlay .gate-door.left{left:0;border-right:1px solid rgba(223,166,62,0.55);}' +
-    '#gateOverlay .gate-door.right{right:0;border-left:1px solid rgba(223,166,62,0.55);}' +
+    '#gateOverlay .gate-door{position:absolute;top:0;bottom:0;width:50.5%;background:linear-gradient(180deg,#F7F2E7,#EFE7D4);z-index:3;display:none;will-change:transform;}' +
+    '#gateOverlay .gate-door.left{left:0;border-right:3px solid #DFA63E;box-shadow:8px 0 28px rgba(38,51,59,0.22);}' +
+    '#gateOverlay .gate-door.right{right:0;border-left:3px solid #DFA63E;box-shadow:-8px 0 28px rgba(38,51,59,0.22);}' +
     '#gateOverlay.gate-doors .gate-vignette,#gateOverlay.gate-doors .gate-specks{opacity:0;transition:opacity 260ms ease;}' +
     '#gateOverlay.gate-doors{background:transparent;}' +
-    '#gateOverlay.gate-doors .gate-door{display:block;transition:transform 900ms cubic-bezier(.65,0,.35,1);}' +
+    '#gateOverlay.gate-doors .gate-door{display:block;transition:transform 1400ms cubic-bezier(.7,0,.3,1) 150ms;}' +
     '#gateOverlay.gate-open .gate-door.left{transform:translate3d(-100%,0,0);}' +
     '#gateOverlay.gate-open .gate-door.right{transform:translate3d(100%,0,0);}' +
     '#gateOverlay.gate-fade{transition:opacity 200ms ease;opacity:0;}' +
@@ -166,7 +166,7 @@
           overlay.classList.add("gate-open");
         });
       });
-      window.setTimeout(function () { overlay.remove(); }, 960);
+      window.setTimeout(function () { overlay.remove(); }, 1650);
     }, 280);
   }
 
