@@ -32,35 +32,97 @@
   // ===========================================================================
   function makeLabelTexture(idText, titleText, studentsText) {
     var canvas = document.createElement("canvas");
-    canvas.width = 512;
-    canvas.height = 320;
+    canvas.width = 640;
+    canvas.height = 400;
     var ctx = canvas.getContext("2d");
+
+    // soft baked drop shadow under the card
+    ctx.save();
+    ctx.shadowColor = "rgba(38,51,59,0.30)";
+    ctx.shadowBlur = 26;
+    ctx.shadowOffsetY = 12;
     ctx.fillStyle = "#FFFFFF";
-    roundRect(ctx, 8, 8, canvas.width - 16, canvas.height - 16, 24);
+    roundRect(ctx, 24, 18, 592, 344, 30);
     ctx.fill();
-    ctx.strokeStyle = "#ECECEC";
+    ctx.restore();
+
+    // warm cream base with a faint vertical sheen
+    var sheen = ctx.createLinearGradient(0, 18, 0, 362);
+    sheen.addColorStop(0, "#FFFFFF");
+    sheen.addColorStop(1, "#FBF7EE");
+    ctx.fillStyle = sheen;
+    roundRect(ctx, 24, 18, 592, 344, 30);
+    ctx.fill();
+    ctx.strokeStyle = "#E8E2D4";
     ctx.lineWidth = 3;
-    roundRect(ctx, 8, 8, canvas.width - 16, canvas.height - 16, 24);
+    roundRect(ctx, 24, 18, 592, 344, 30);
     ctx.stroke();
 
-    ctx.fillStyle = "#B8862B";
-    ctx.font = "700 60px 'Space Grotesk', sans-serif";
+    // gold accent bar across the top edge
+    ctx.save();
+    roundRect(ctx, 24, 18, 592, 344, 30);
+    ctx.clip();
+    ctx.fillStyle = "#DFA63E";
+    ctx.fillRect(24, 18, 592, 14);
+    ctx.restore();
+
+    // booth badge pill
+    var badge = /^\d+$/.test(idText) ? "BOOTH " + idText : idText + " PLACE";
+    ctx.font = "600 24px 'IBM Plex Mono', monospace";
+    var bw = ctx.measureText(badge).width + 44;
+    ctx.fillStyle = "#DFA63E";
+    roundRect(ctx, (640 - bw) / 2, 58, bw, 44, 22);
+    ctx.fill();
+    ctx.fillStyle = "#FFFFFF";
     ctx.textAlign = "center";
-    ctx.fillText(idText, canvas.width / 2, 100);
+    ctx.textBaseline = "middle";
+    ctx.fillText(badge, 320, 81);
 
+    // venture title, up to two lines, big and dark
+    ctx.textBaseline = "alphabetic";
     ctx.fillStyle = "#26333B";
-    ctx.font = "600 32px 'Space Grotesk', sans-serif";
-    wrapCanvasText(ctx, titleText, canvas.width / 2, 155, canvas.width - 60, 38);
+    ctx.font = "700 52px 'Space Grotesk', sans-serif";
+    var titleLines = splitLines(ctx, titleText, 552);
+    if (titleLines.length > 1) {
+      ctx.font = "700 44px 'Space Grotesk', sans-serif";
+      titleLines = splitLines(ctx, titleText, 552);
+    }
+    var ty = titleLines.length > 1 ? 168 : 188;
+    titleLines.slice(0, 2).forEach(function (l, i) {
+      ctx.fillText(l, 320, ty + i * 52);
+    });
 
+    // gold rule between title and students
+    ctx.fillStyle = "#DFA63E";
+    ctx.fillRect(320 - 36, 266, 72, 5);
+
+    // student names
     if (studentsText) {
-      ctx.fillStyle = "#26333B";
-      ctx.font = "600 24px 'IBM Plex Mono', monospace";
-      wrapCanvasText(ctx, studentsText, canvas.width / 2, 258, canvas.width - 60, 28);
+      ctx.fillStyle = "#3E4C55";
+      ctx.font = "600 27px 'IBM Plex Mono', monospace";
+      var nameLines = splitLines(ctx, studentsText, 552);
+      var ny = nameLines.length > 1 ? 308 : 320;
+      nameLines.slice(0, 2).forEach(function (l, i) {
+        ctx.fillText(l, 320, ny + i * 34);
+      });
     }
 
     var texture = new THREE.CanvasTexture(canvas);
+    texture.anisotropy = 8;
     texture.needsUpdate = true;
     return texture;
+  }
+
+  function splitLines(ctx, text, maxWidth) {
+    var words = String(text || "").split(" ");
+    var line = "", lines = [];
+    words.forEach(function (w) {
+      var test = (line + " " + w).trim();
+      if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
+      else line = test;
+    });
+    if (line) lines.push(line);
+    return lines;
   }
 
   function roundRect(ctx, x, y, w, h, r) {
@@ -248,10 +310,10 @@
     roundRect(ctx, 26, 26, 204, 204, 46);
     ctx.stroke();
     ctx.fillStyle = "#FBFAF7";
-    ctx.font = "700 132px 'Space Grotesk', sans-serif";
+    ctx.font = "700 108px 'Space Grotesk', sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText((letter || "?").toUpperCase(), 128, 138);
+    ctx.fillText(String(letter || "?"), 128, 136);
     var tex = new THREE.CanvasTexture(c);
     tex.anisotropy = 4;
     return tex;
@@ -675,15 +737,15 @@
     var texture = makeLabelTexture(project.id, project.title, project.students.join(", "));
     var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
     var sprite = new THREE.Sprite(spriteMat);
-    sprite.scale.set(1.9, 1.19, 1);
+    sprite.scale.set(2.56, 1.6, 1);
     sprite.position.set(pos.x, 2.6, pos.z);
     sprite.userData.baseY = 2.6;
     sprite.userData.phase = index * 0.65;
     scene.add(sprite);
     floatingSprites.push(sprite);
 
-    // storefront sign on the aisle-facing plinth face: the venture's initial
-    var initial = (project.title || "?").trim().charAt(0);
+    // storefront sign on the aisle-facing plinth face: the booth number
+    var initial = project.id;
     var plaque = new THREE.Mesh(
       new THREE.BoxGeometry(PLAQUE_SIZE, PLAQUE_SIZE, 0.05),
       toonMaterial(0xffffff, { map: makePlaqueTexture(initial, color) })
@@ -766,7 +828,7 @@
       var texture = makeLabelTexture(spec.label, project.title, project.students.join(", "));
       var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
       var sprite = new THREE.Sprite(spriteMat);
-      sprite.scale.set(1.9, 1.19, 1);
+      sprite.scale.set(2.56, 1.6, 1);
       var baseY = spec.height + 1.0;
       sprite.position.set(spec.x, baseY, podiumZ);
       sprite.userData.baseY = baseY;
