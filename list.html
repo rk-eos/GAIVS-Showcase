@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://drive.google.com; object-src 'none'; base-uri 'none'; form-action 'none'">
-<meta name="referrer" content="no-referrer">
+<meta name="referrer" content="origin">
 <script src="transitions.js?v=1"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,7 +42,7 @@
     <div class="watch-media">
       <div class="watch-media__frame">
         <video id="watchVideo" controls preload="metadata"></video>
-        <iframe id="watchVideoFrame" title="Pitch video" allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer" allowfullscreen hidden></iframe>
+        <iframe id="watchVideoFrame" title="Pitch video" allow="autoplay; encrypted-media; fullscreen" referrerpolicy="origin" allowfullscreen hidden></iframe>
         <div id="watchVideoPlaceholder" class="media-placeholder" hidden>Video not yet uploaded</div>
       </div>
       <a id="watchVideoExternalLink" class="deck-open-link" style="margin-top:10px;" target="_blank" rel="noopener" hidden>&#127909; Watch video externally &#8599;</a>
