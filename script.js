@@ -30,86 +30,154 @@
   // ===========================================================================
   // CANVAS TEXT LABEL (booth number + title, drawn to a canvas texture)
   // ===========================================================================
-  function makeLabelTexture(idText, titleText, studentsText) {
+  // Poster card: deck title-slide thumbnail on top (when available), accent
+  // "poster frame" with a watermark booth number otherwise; badge + title +
+  // student names below. Thumbnails arrive base64-encoded in the encrypted
+  // payload, so they load async and repaint the texture when ready.
+  var CARD_W = 640, CARD_H = 500;
+  var POSTER_H = 232;
+  function makeLabelTexture(idText, titleText, studentsText, opts) {
+    opts = opts || {};
+    var accent = opts.accent || "#37788A";
     var canvas = document.createElement("canvas");
-    canvas.width = 640;
-    canvas.height = 400;
+    canvas.width = CARD_W;
+    canvas.height = CARD_H;
     var ctx = canvas.getContext("2d");
 
-    // soft baked drop shadow under the card
-    ctx.save();
-    ctx.shadowColor = "rgba(38,51,59,0.30)";
-    ctx.shadowBlur = 26;
-    ctx.shadowOffsetY = 12;
-    ctx.fillStyle = "#FFFFFF";
-    roundRect(ctx, 24, 18, 592, 344, 30);
-    ctx.fill();
-    ctx.restore();
+    var CX = 24, CY = 16, CW = 592, CHH = 452, R = 30;
 
-    // warm cream base with a faint vertical sheen
-    var sheen = ctx.createLinearGradient(0, 18, 0, 362);
-    sheen.addColorStop(0, "#FFFFFF");
-    sheen.addColorStop(1, "#FBF7EE");
-    ctx.fillStyle = sheen;
-    roundRect(ctx, 24, 18, 592, 344, 30);
-    ctx.fill();
-    ctx.strokeStyle = "#E8E2D4";
-    ctx.lineWidth = 3;
-    roundRect(ctx, 24, 18, 592, 344, 30);
-    ctx.stroke();
+    function cardPath() { roundRect(ctx, CX, CY, CW, CHH, R); }
 
-    // gold accent bar across the top edge
-    ctx.save();
-    roundRect(ctx, 24, 18, 592, 344, 30);
-    ctx.clip();
-    ctx.fillStyle = "#DFA63E";
-    ctx.fillRect(24, 18, 592, 14);
-    ctx.restore();
-
-    // booth badge pill
-    var badge = /^\d+$/.test(idText) ? "BOOTH " + idText : idText + " PLACE";
-    ctx.font = "600 24px 'IBM Plex Mono', monospace";
-    var bw = ctx.measureText(badge).width + 44;
-    ctx.fillStyle = "#DFA63E";
-    roundRect(ctx, (640 - bw) / 2, 58, bw, 44, 22);
-    ctx.fill();
-    ctx.fillStyle = "#FFFFFF";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(badge, 320, 81);
-
-    // venture title, up to two lines, big and dark
-    ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = "#26333B";
-    ctx.font = "700 52px 'Space Grotesk', sans-serif";
-    var titleLines = splitLines(ctx, titleText, 552);
-    if (titleLines.length > 1) {
-      ctx.font = "700 44px 'Space Grotesk', sans-serif";
-      titleLines = splitLines(ctx, titleText, 552);
+    function drawBase() {
+      ctx.clearRect(0, 0, CARD_W, CARD_H);
+      ctx.save();
+      ctx.shadowColor = "rgba(38,51,59,0.30)";
+      ctx.shadowBlur = 26;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = "#FFFFFF";
+      cardPath();
+      ctx.fill();
+      ctx.restore();
+      var sheen = ctx.createLinearGradient(0, CY, 0, CY + CHH);
+      sheen.addColorStop(0, "#FFFFFF");
+      sheen.addColorStop(1, "#FBF7EE");
+      ctx.fillStyle = sheen;
+      cardPath();
+      ctx.fill();
     }
-    var ty = titleLines.length > 1 ? 168 : 188;
-    titleLines.slice(0, 2).forEach(function (l, i) {
-      ctx.fillText(l, 320, ty + i * 52);
-    });
 
-    // gold rule between title and students
-    ctx.fillStyle = "#DFA63E";
-    ctx.fillRect(320 - 36, 266, 72, 5);
+    function drawPosterFallback() {
+      ctx.save();
+      cardPath();
+      ctx.clip();
+      ctx.fillStyle = accent;
+      ctx.fillRect(CX, CY, CW, POSTER_H);
+      // subtle diagonal texture
+      ctx.strokeStyle = "rgba(255,255,255,0.08)";
+      ctx.lineWidth = 10;
+      for (var x = -CARD_H; x < CARD_W + CARD_H; x += 34) {
+        ctx.beginPath();
+        ctx.moveTo(x, CY);
+        ctx.lineTo(x + POSTER_H, CY + POSTER_H);
+        ctx.stroke();
+      }
+      // giant watermark number
+      ctx.fillStyle = "rgba(255,255,255,0.20)";
+      ctx.font = "700 190px 'Space Grotesk', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(String(idText), CARD_W / 2, CY + POSTER_H / 2 + 12);
+      ctx.restore();
+    }
 
-    // student names
-    if (studentsText) {
-      ctx.fillStyle = "#3E4C55";
-      ctx.font = "600 27px 'IBM Plex Mono', monospace";
-      var nameLines = splitLines(ctx, studentsText, 552);
-      var ny = nameLines.length > 1 ? 308 : 320;
-      nameLines.slice(0, 2).forEach(function (l, i) {
-        ctx.fillText(l, 320, ny + i * 34);
+    function drawPosterImage(img) {
+      ctx.save();
+      cardPath();
+      ctx.clip();
+      // cover-fit the thumb into the poster area
+      var aw = CW / POSTER_H, ai = img.width / img.height;
+      var sw, sh, sx, sy;
+      if (ai > aw) { sh = img.height; sw = sh * aw; sx = (img.width - sw) / 2; sy = 0; }
+      else { sw = img.width; sh = sw / aw; sx = 0; sy = (img.height - sh) / 2; }
+      ctx.drawImage(img, sx, sy, sw, sh, CX, CY, CW, POSTER_H);
+      // soft darkening at the bottom so the badge reads over any slide
+      var fade = ctx.createLinearGradient(0, CY + POSTER_H - 70, 0, CY + POSTER_H);
+      fade.addColorStop(0, "rgba(20,27,32,0)");
+      fade.addColorStop(1, "rgba(20,27,32,0.35)");
+      ctx.fillStyle = fade;
+      ctx.fillRect(CX, CY + POSTER_H - 70, CW, 70);
+      ctx.restore();
+    }
+
+    function drawFront() {
+      // badge pill straddling the poster edge
+      var badge = /^\d+$/.test(idText) ? "BOOTH " + idText : idText + " PLACE";
+      ctx.font = "600 24px 'IBM Plex Mono', monospace";
+      ctx.textAlign = "center";
+      var bw = ctx.measureText(badge).width + 44;
+      ctx.save();
+      ctx.shadowColor = "rgba(38,51,59,0.25)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 3;
+      ctx.fillStyle = "#DFA63E";
+      roundRect(ctx, (CARD_W - bw) / 2, CY + POSTER_H - 22, bw, 44, 22);
+      ctx.fill();
+      ctx.restore();
+      ctx.fillStyle = "#FFFFFF";
+      ctx.textBaseline = "middle";
+      ctx.fillText(badge, CARD_W / 2, CY + POSTER_H);
+
+      // venture title
+      ctx.textBaseline = "alphabetic";
+      ctx.fillStyle = "#26333B";
+      ctx.font = "700 50px 'Space Grotesk', sans-serif";
+      var titleLines = splitLines(ctx, titleText, 540);
+      if (titleLines.length > 1) {
+        ctx.font = "700 42px 'Space Grotesk', sans-serif";
+        titleLines = splitLines(ctx, titleText, 540);
+      }
+      var ty = titleLines.length > 1 ? 330 : 352;
+      titleLines.slice(0, 2).forEach(function (l, i) {
+        ctx.fillText(l, CARD_W / 2, ty + i * 50);
       });
+
+      ctx.fillStyle = "#DFA63E";
+      ctx.fillRect(CARD_W / 2 - 36, 396, 72, 5);
+
+      if (studentsText) {
+        ctx.fillStyle = "#3E4C55";
+        ctx.font = "600 26px 'IBM Plex Mono', monospace";
+        var nameLines = splitLines(ctx, studentsText, 540);
+        var ny = nameLines.length > 1 ? 428 : 438;
+        nameLines.slice(0, 2).forEach(function (l, i) {
+          ctx.fillText(l, CARD_W / 2, ny + i * 32);
+        });
+      }
+
+      ctx.strokeStyle = "#E8E2D4";
+      ctx.lineWidth = 3;
+      cardPath();
+      ctx.stroke();
     }
+
+    drawBase();
+    drawPosterFallback();
+    drawFront();
 
     var texture = new THREE.CanvasTexture(canvas);
     texture.anisotropy = 8;
     texture.needsUpdate = true;
+
+    if (opts.thumb) {
+      var img = new Image();
+      img.onload = function () {
+        drawBase();
+        drawPosterImage(img);
+        drawFront();
+        texture.needsUpdate = true;
+      };
+      img.src = opts.thumb;
+    }
     return texture;
   }
 
@@ -735,10 +803,10 @@
     scene.add(top);
     clickableMeshes.push(top);
 
-    var texture = makeLabelTexture(project.id, project.title, project.students.join(", "));
+    var texture = makeLabelTexture(project.id, project.title, project.students.join(", "), { accent: "#" + ("000000" + color.toString(16)).slice(-6), thumb: project.thumb });
     var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
     var sprite = new THREE.Sprite(spriteMat);
-    sprite.scale.set(2.56, 1.6, 1);
+    sprite.scale.set(2.35, 1.836, 1);
     sprite.position.set(pos.x, 2.6, pos.z);
     sprite.userData.baseY = 2.6;
     sprite.userData.phase = index * 0.65;
@@ -826,10 +894,10 @@
       shadowBlob.position.set(spec.x, 0.015, podiumZ);
       scene.add(shadowBlob);
 
-      var texture = makeLabelTexture(spec.label, project.title, project.students.join(", "));
+      var texture = makeLabelTexture(spec.label, project.title, project.students.join(", "), { accent: "#" + ("000000" + spec.color.toString(16)).slice(-6), thumb: project.thumb });
       var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
       var sprite = new THREE.Sprite(spriteMat);
-      sprite.scale.set(2.56, 1.6, 1);
+      sprite.scale.set(2.35, 1.836, 1);
       var baseY = spec.height + 1.0;
       sprite.position.set(spec.x, baseY, podiumZ);
       sprite.userData.baseY = baseY;
