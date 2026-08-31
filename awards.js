@@ -697,74 +697,8 @@
       var place = parseInt(btn.dataset.place, 10);
       var project = revealedProjectByPlace[place];
       if (project) openWatch(project);
-      return;
-    }
-    var saveBtn = e.target.closest(".podium__save-btn");
-    if (saveBtn) {
-      var savePlace = parseInt(saveBtn.dataset.place, 10);
-      var saveProject = revealedProjectByPlace[savePlace];
-      if (saveProject) downloadCertificate(saveProject, savePlace);
     }
   });
-
-  var certPrizes = { 1: "$3,000", 2: "$1,500", 3: "$500" };
-  var certLabels = { 1: "1ST PLACE", 2: "2ND PLACE", 3: "3RD PLACE" };
-  var certLogo = new Image();
-  certLogo.src = "assets/img/gaivs-logo-full.png";
-
-  function downloadCertificate(project, place) {
-    var c = document.createElement("canvas");
-    c.width = 1200; c.height = 800;
-    var ctx = c.getContext("2d");
-    ctx.fillStyle = "#FBFAF7"; ctx.fillRect(0, 0, 1200, 800);
-    ctx.strokeStyle = "#DFA63E"; ctx.lineWidth = 6;
-    ctx.strokeRect(24, 24, 1152, 752);
-    var logoH = 56, logoW = certLogo.width ? logoH * (certLogo.width / certLogo.height) : 190;
-    if (certLogo.complete && certLogo.naturalWidth) ctx.drawImage(certLogo, (1200 - logoW) / 2, 70, logoW, logoH);
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#DFA63E";
-    ctx.font = "700 30px 'Space Grotesk', sans-serif";
-    ctx.fillText(certLabels[place] || "", 600, 190);
-    ctx.fillStyle = "#26333B";
-    ctx.font = "700 46px 'Space Grotesk', sans-serif";
-    ctx.fillText(project.title, 600, 270);
-    ctx.font = "20px 'IBM Plex Mono', monospace";
-    ctx.fillStyle = "#5F6B72";
-    ctx.fillText(project.students.join(", "), 600, 320);
-    ctx.fillStyle = "#37788A";
-    ctx.font = "italic 22px 'Source Serif 4', serif";
-    wrapCenter(ctx, project.blurb, 600, 400, 900, 34);
-    ctx.fillStyle = "#DFA63E";
-    ctx.font = "700 40px 'Space Grotesk', sans-serif";
-    ctx.fillText(certPrizes[place] || "", 600, 560);
-    ctx.font = "16px 'IBM Plex Mono', monospace";
-    ctx.fillStyle = "#8A949A";
-    ctx.fillText("10,000 vibecoding credits on SparkEd CodeBox", 600, 590);
-    ctx.fillStyle = "#26333B";
-    ctx.font = "700 22px 'Space Grotesk', sans-serif";
-    ctx.fillText("GLOBAL AI VENTURE STUDIO · 2026", 600, 700);
-    triggerDownload(c, "gaivs-2026-" + (project.id || "winner") + "-certificate.png");
-  }
-
-  function wrapCenter(ctx, text, x, y, maxWidth, lineHeight) {
-    var words = text.split(" "), line = "", lines = [];
-    words.forEach(function (w) {
-      var test = (line + " " + w).trim();
-      if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
-      else line = test;
-    });
-    if (line) lines.push(line);
-    lines.slice(0, 2).forEach(function (l, i) { ctx.fillText(l, x, y + i * lineHeight); });
-  }
-
-  function triggerDownload(canvas, filename) {
-    canvas.toBlob(function (blob) {
-      var a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-    });
-  }
 
   watchOverlay.addEventListener("click", closeWatch);
   watchClose.addEventListener("click", closeWatch);

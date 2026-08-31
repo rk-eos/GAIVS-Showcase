@@ -35,7 +35,7 @@
     canvas.width = 512;
     canvas.height = 320;
     var ctx = canvas.getContext("2d");
-    ctx.fillStyle = "rgba(255,255,255,0.96)";
+    ctx.fillStyle = "#FFFFFF";
     roundRect(ctx, 8, 8, canvas.width - 16, canvas.height - 16, 24);
     ctx.fill();
     ctx.strokeStyle = "#ECECEC";
@@ -43,7 +43,7 @@
     roundRect(ctx, 8, 8, canvas.width - 16, canvas.height - 16, 24);
     ctx.stroke();
 
-    ctx.fillStyle = "#DFA63E";
+    ctx.fillStyle = "#B8862B";
     ctx.font = "700 60px 'Space Grotesk', sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(idText, canvas.width / 2, 100);
@@ -53,8 +53,8 @@
     wrapCanvasText(ctx, titleText, canvas.width / 2, 155, canvas.width - 60, 38);
 
     if (studentsText) {
-      ctx.fillStyle = "#5F6B72";
-      ctx.font = "22px 'IBM Plex Mono', monospace";
+      ctx.fillStyle = "#26333B";
+      ctx.font = "600 24px 'IBM Plex Mono', monospace";
       wrapCanvasText(ctx, studentsText, canvas.width / 2, 258, canvas.width - 60, 28);
     }
 
@@ -469,27 +469,6 @@
 
   (function buildAtmosphere() {
     if (!glassBays.length) return;
-
-    // faint angled planes reading as shafts of dusk light coming off each bay
-    var shaftTex = makeShaftTexture();
-    var shaftMat = new THREE.MeshBasicMaterial({
-      map: shaftTex, transparent: true, opacity: SHAFT_OPACITY, depthWrite: false,
-      blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-    });
-    shaftMat.fog = false;
-    var shaftGeo = new THREE.PlaneGeometry(BAY_LEN * 0.9, WALL_H + 1.5);
-
-    glassBays.forEach(function (bay) {
-      var zc = (bay.z0 + bay.z1) / 2;
-      [-1, 1].forEach(function (side) {
-        var shaft = new THREE.Mesh(shaftGeo, shaftMat);
-        shaft.position.set(side * 2.1, (WALL_H + 1.5) / 2 - 0.4, zc);
-        shaft.rotation.y = Math.PI / 2;           // face across the hall, length along Z
-        shaft.rotation.z = side * 0.22;           // rake it toward the aisle
-        shaft.renderOrder = 2;
-        scene.add(shaft);
-      });
-    });
 
     // dust motes, distributed evenly across the glass bays only
     var perBay = Math.max(8, Math.floor(MOTES_TOTAL / glassBays.length));
@@ -957,8 +936,10 @@
       return (p.title + " " + p.students.join(" ") + " " + p.id).toLowerCase().indexOf(term) !== -1;
     });
     if (match) {
-      var pairZ = match.__z;
-      var progress = (pairZ - START_Z) / (END_Z - START_Z);
+      // stop a few units short of the booth so it sits in front of the camera
+      // rather than beside/behind it
+      var pairZ = match.__z + 5;
+      var progress = Math.max(0, Math.min(1, (pairZ - START_Z) / (END_Z - START_Z)));
       setProgress(progress);
       flashBooth(match.__meshes);
       hint.classList.add("is-hidden");
@@ -1075,7 +1056,7 @@
     if (!boothId) return;
     var idx = PROJECTS.findIndex(function (p) { return p.id === boothId; });
     if (idx === -1) return;
-    setProgress((PROJECTS[idx].__z - START_Z) / (END_Z - START_Z));
+    setProgress(Math.max(0, Math.min(1, (PROJECTS[idx].__z + 5 - START_Z) / (END_Z - START_Z))));
     setTimeout(function () { openPanel(idx); }, 900);
   })();
 
