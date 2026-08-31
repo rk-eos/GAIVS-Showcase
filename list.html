@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://drive.google.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<script src="transitions.js?v=1"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Global AI Venture Studio: student teams build real AI ventures. Explore the showcase, meet the winners, and see all 17 projects.">
+<meta property="og:title" content="All Submissions · Global AI Venture Studio">
+<meta property="og:description" content="Student teams build real AI ventures with AI. Explore the showcase and meet the winners.">
+<meta property="og:type" content="website">
+<title>All Submissions · Global AI Venture Studio</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16.png">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css?v=10">
+<link rel="stylesheet" href="awards.css?v=22">
+<link rel="stylesheet" href="listing.css?v=3">
+</head>
+<body>
+
+<header class="list-header">
+  <div>
+    <a href="index.html" class="back-link">&larr; Back to results</a>
+    <p class="eyebrow">Global AI Venture Studio &middot; Final Showcase</p>
+    <h1>All <span class="brand-teal">Submissions</span></h1>
+    <p class="subtitle">A simple list view of all 17 projects. Use this if the 3D hallway doesn&rsquo;t load for you. <a href="hall.html">Try the 3D hall instead &rarr;</a></p>
+  </div>
+  <div class="list-header__search">
+    <input id="searchInput" type="text" placeholder="Find a project or student" aria-label="Search projects">
+  </div>
+</header>
+
+<main class="list-wrap" id="listWrap"></main>
+
+<div id="watchOverlay" class="watch-overlay" hidden></div>
+<div id="watchModal" class="watch-modal" hidden aria-hidden="true">
+  <button id="watchClose" class="watch-modal__close" aria-label="Close">&#10005;</button>
+  <div class="watch-modal__body">
+    <h3 id="watchTitle"></h3>
+    <div class="watch-media">
+      <div class="watch-media__frame">
+        <video id="watchVideo" controls preload="metadata"></video>
+        <iframe id="watchVideoFrame" title="Pitch video" allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer" allowfullscreen hidden></iframe>
+        <div id="watchVideoPlaceholder" class="media-placeholder" hidden>Video not yet uploaded</div>
+      </div>
+      <a id="watchVideoExternalLink" class="deck-open-link" style="margin-top:10px;" target="_blank" rel="noopener" hidden>&#127909; Watch video externally &#8599;</a>
+    </div>
+    <div id="watchAskWrap" class="watch-detail" hidden>
+      <h4 class="watch-detail__label">The ask</h4>
+      <p class="watch-detail__text" id="watchAsk"></p>
+    </div>
+    <div id="watchCommitmentWrap" class="watch-detail" hidden>
+      <h4 class="watch-detail__label">Founder commitment</h4>
+      <p class="watch-detail__text" id="watchCommitment"></p>
+    </div>
+    <a id="watchDeckLink" class="deck-open-link" target="_blank" rel="noopener">&#128196; Open pitch deck &#8599;</a>
+    <a id="watchPrototypeLink" class="deck-open-link" target="_blank" rel="noopener">&#128295; Try the prototype &#8599;</a>
+  </div>
+</div>
+
+<script src="gate.js?v=3" data-scripts="safeurl.js?v=1,listing.js?v=7"></script>
+</body>
+</html>

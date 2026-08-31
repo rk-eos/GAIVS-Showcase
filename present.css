@@ -1,0 +1,165 @@
+/* ===========================================================================
+   PRESENT MODE — activated by ?present=1 via present.js (adds .is-presenting
+   to <html>). Everything here is scoped under html.is-presenting so the file
+   is inert on normal page loads.
+   Brand: cream #FBFAF7 · ink #26333B · gold #DFA63E
+   =========================================================================== */
+
+html.is-presenting {
+  --present-cream: #FBFAF7;
+  --present-ink: #26333B;
+  --present-gold: #DFA63E;
+}
+
+/* ---------------------------------------------------------------------------
+   1 · RECORDING CLUTTER
+--------------------------------------------------------------------------- */
+
+/* index.html — testing banner and reset affordance never belong on camera */
+html.is-presenting .placeholder-warning,
+html.is-presenting #resetRevealBtn {
+  display: none !important;
+}
+
+/* index.html — freeze the credit footnote at one steady opacity so a stray
+   mouse crossing it doesn't flicker mid-take */
+html.is-presenting .credit-footnote,
+html.is-presenting .credit-footnote:hover {
+  opacity: 0.55 !important;
+  transition: none !important;
+}
+
+/* hall.html — the hint bubble reads as UI chrome in a recording */
+html.is-presenting #hallwayHint {
+  display: none !important;
+}
+
+/* hall.html — after 3s the header slims down so the 3D view dominates.
+   present.js adds .present-header-slim once the timer fires. */
+html.is-presenting .hall-header {
+  transition: padding 0.7s ease, opacity 0.7s ease;
+}
+html.is-presenting .hall-header.present-header-slim {
+  padding-top: 14px;
+  padding-bottom: 10px;
+}
+html.is-presenting .hall-header.present-header-slim .subtitle,
+html.is-presenting .hall-header.present-header-slim .hall-note,
+html.is-presenting .hall-header.present-header-slim .back-link {
+  opacity: 0;
+  max-height: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 0.5s ease, max-height 0.6s ease, margin 0.6s ease;
+}
+html.is-presenting .hall-header .subtitle,
+html.is-presenting .hall-header .hall-note,
+html.is-presenting .hall-header .back-link {
+  max-height: 200px;
+  transition: opacity 0.5s ease, max-height 0.6s ease, margin 0.6s ease;
+}
+html.is-presenting .hall-header.present-header-slim h1 {
+  font-size: clamp(24px, 3.2vw, 34px);
+  transition: font-size 0.6s ease;
+}
+html.is-presenting .hall-header.present-header-slim .eyebrow {
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------------------------
+   2 · PRESENTER HUD — bottom-right, small, faint. Readable to the presenter
+   on their own screen, easy to crop out or ignore in the recording.
+--------------------------------------------------------------------------- */
+
+.present-hud {
+  position: fixed;
+  right: 10px;
+  bottom: 8px;
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px;
+  border: 1px solid rgba(38, 51, 59, 0.18);
+  border-radius: 6px;
+  background: rgba(251, 250, 247, 0.72);
+  color: #26333B;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0.4;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.25s ease;
+}
+.present-hud__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #DFA63E;
+  flex-shrink: 0;
+}
+.present-hud__keys {
+  color: rgba(38, 51, 59, 0.55);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+}
+
+/* ---------------------------------------------------------------------------
+   3 · CLEAN CURSOR — "c" toggles a mouse-free recording
+--------------------------------------------------------------------------- */
+
+html.present-no-cursor,
+html.present-no-cursor * {
+  cursor: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   4 · COUNTDOWN — "3" gives a 3-2-1 sync overlay before a narration take
+--------------------------------------------------------------------------- */
+
+.present-countdown {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(251, 250, 247, 0.9);
+  color: #26333B;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.45s ease;
+}
+.present-countdown.present-countdown--out {
+  opacity: 0;
+}
+.present-countdown__num {
+  font-family: "Space Grotesk", "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: clamp(120px, 26vw, 300px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #26333B;
+  animation: present-count-pop 0.45s ease-out;
+}
+.present-countdown__num--go {
+  font-size: clamp(60px, 12vw, 140px);
+  color: #DFA63E;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@keyframes present-count-pop {
+  from { transform: scale(0.86); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .present-countdown__num { animation: none; }
+}

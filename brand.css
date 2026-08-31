@@ -1,0 +1,42 @@
+:root {
+  --teal: #37788A;
+  --teal-hover: #2C6473;
+  --gold: #DFA63E;
+  --gold-hover: #C8912F;
+  --maroon: #8E2E4D;
+
+  --page-bg: #FBFAF7;
+  --card-bg: #FFFFFF;
+  --surface: #F4F5F6;
+
+  --ink: #26333B;
+  --body-text: #5F6B72;
+  --meta: #8A949A;
+  --hairline: #ECECEC;
+
+  --tint-teal: #E9F1F1;
+  --tint-gold: #FAF2E1;
+  --tint-maroon: #F7EBEF;
+  --tint-neutral: #F1F2F3;
+
+  --font-display: "Space Grotesk", "Poppins", sans-serif;
+  --font-body: "Inter", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--page-bg); color: var(--ink); font-family: var(--font-body); min-height: 100%; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.brand-teal { color: var(--teal); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* page fade transition, shared across pages */
+html.page-fade { opacity: 0; transition: opacity 0.18s ease; }
+html.page-fade.page-fade-in { opacity: 1; }

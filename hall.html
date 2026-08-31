@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://drive.google.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<script src="transitions.js?v=1"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Global AI Venture Studio: student teams build real AI ventures. Explore the showcase, meet the winners, and see all 17 projects.">
+<meta property="og:title" content="Project Showcase · Global AI Venture Studio">
+<meta property="og:description" content="Student teams build real AI ventures with AI. Explore the showcase and meet the winners.">
+<meta property="og:type" content="website">
+<title>Project Showcase · Global AI Venture Studio</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/img/favicon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=30">
+<link rel="stylesheet" href="present.css?v=1">
+</head>
+<body>
+
+<header class="hall-header hall-header--compact">
+  <div class="hall-header__title">
+    <a href="index.html" class="back-link">&larr; Back to results</a>
+    <p class="eyebrow">Global AI Venture Studio &middot; Final Showcase</p>
+    <h1>Project <span class="brand-teal">Showcase</span></h1>
+    <p class="subtitle">Walk the hall. Click any booth to watch the pitch and read the deck. Scroll, drag the bar below, or use the &larr; &rarr; arrows to move. Click the podium at the end to see the winners.</p>
+    <p class="hall-note">Booths are numbered for wayfinding only, this order isn't a ranking. Trouble loading the 3D hall? <a href="list.html">View as a simple list instead &rarr;</a></p>
+  </div>
+  <div class="hall-header__controls">
+    <div class="search-wrap">
+      <input id="searchInput" type="text" placeholder="Find a project, then press Enter" aria-label="Search projects, press Enter to walk to the match">
+    </div>
+  </div>
+</header>
+
+<main class="hallway-wrap">
+  <canvas id="hallwayCanvas" aria-label="3D walkthrough of exhibition booths"></canvas>
+  <div id="hallwayLoader" class="hallway-loader"><span>Loading the hall&hellip;</span></div>
+
+  <div class="hallway-hint" id="hallwayHint">
+    Scroll, drag the bar below, or use &larr; &rarr; to walk &middot; click a booth to open it
+  </div>
+
+  <div class="hallway-progress-wrap">
+    <span class="hallway-progress-label">Entrance</span>
+    <input id="walkSlider" class="walk-slider" type="range" min="0" max="1000" value="0" aria-label="Position in the hallway">
+    <span class="hallway-progress-label">End of hall</span>
+  </div>
+
+  <div class="hallway-controls">
+    <button id="walkBack" class="walk-btn" aria-label="Walk backward">&larr;</button>
+    <span id="boothCounter" class="hallway-counter">Entrance</span>
+    <button id="walkForward" class="walk-btn" aria-label="Walk forward">&rarr;</button>
+    <button id="autoWalkBtn" class="walk-btn walk-btn--play" aria-label="Play walkthrough">&#9654;</button>
+  </div>
+</main>
+
+<!-- Detail panel -->
+<div id="overlay" class="overlay" hidden></div>
+<aside id="panel" class="panel" hidden aria-hidden="true" aria-label="Project details">
+  <button id="panelClose" class="panel__close" aria-label="Close project details">&#10005;</button>
+
+  <div class="panel__nav">
+    <button id="panelPrev" class="panel__nav-btn" aria-label="Previous booth">&lsaquo; Prev</button>
+    <span id="panelBoothId" class="panel__booth-id"></span>
+    <button id="panelShare" class="panel__nav-btn" aria-label="Copy link to this booth" title="Copy link to this booth">&#128279; Share</button>
+    <button id="panelNext" class="panel__nav-btn" aria-label="Next booth">Next &rsaquo;</button>
+  </div>
+
+  <div class="panel__body">
+    <h2 id="panelTitle"></h2>
+    <p class="panel__students" id="panelStudents"></p>
+    <p class="panel__blurb" id="panelBlurb"></p>
+
+    <div id="panelAskWrap" hidden>
+      <h3 class="panel__media-label">The ask</h3>
+      <p class="panel__blurb" id="panelAsk"></p>
+    </div>
+    <div id="panelCommitmentWrap" hidden>
+      <h3 class="panel__media-label">Founder commitment</h3>
+      <p class="panel__blurb" id="panelCommitment"></p>
+    </div>
+
+    <div class="panel__media">
+      <div class="media-col">
+        <h3 class="panel__media-label">Pitch video</h3>
+        <div class="media-frame media-frame--video">
+          <video id="panelVideo" controls preload="metadata"></video>
+          <iframe id="panelVideoFrame" title="Pitch video" allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer" allowfullscreen hidden></iframe>
+          <div id="panelVideoPlaceholder" class="media-placeholder" hidden>Video not yet uploaded</div>
+        </div>
+        <a id="panelVideoExternalLink" class="deck-open-link" style="margin-top:10px;" target="_blank" rel="noopener" hidden>&#127909; Watch video externally &#8599;</a>
+      </div>
+    </div>
+    <a id="panelDeckLink" class="deck-open-link" target="_blank" rel="noopener">&#128196; Open pitch deck &#8599;</a>
+    <a id="panelPrototypeLink" class="deck-open-link" target="_blank" rel="noopener">&#128295; Try the prototype &#8599;</a>
+  </div>
+</aside>
+
+<script src="data/winners.js?v=5"></script>
+<script src="vendor/three-0.160.0.min.js"></script>
+<script src="gate.js?v=3" data-scripts="safeurl.js?v=1,script.js?v=34"></script>
+<script src="present.js?v=1"></script>
+</body>
+</html>

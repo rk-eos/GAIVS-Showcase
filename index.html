@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://drive.google.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<script src="transitions.js?v=1"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Global AI Venture Studio: student teams build real AI ventures. Explore the showcase, meet the winners, and see all 17 projects.">
+<meta property="og:title" content="Results · Global AI Venture Studio Showcase">
+<meta property="og:description" content="Student teams build real AI ventures with AI. Explore the showcase and meet the winners.">
+<meta property="og:type" content="website">
+<title>Results · Global AI Venture Studio Showcase</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/img/favicon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css?v=10">
+<link rel="stylesheet" href="awards.css?v=22">
+<link rel="stylesheet" href="present.css?v=1">
+</head>
+<body>
+
+<canvas id="particleBg" aria-hidden="true"></canvas>
+<div id="ambience" class="ambience" aria-hidden="true"></div>
+<div id="houseLights" class="house-lights" aria-hidden="true"></div>
+
+<main class="reveal">
+  <img src="assets/img/gaivs-logo-full.png" alt="Global AI Venture Studio, a program of Center for Future Global Leaders" class="reveal__logo">
+  <p class="eyebrow">Global AI Venture Studio · Final Results</p>
+  <h1 class="reveal__title">And the winners are<span class="dots">&hellip;</span></h1>
+  <p class="reveal__subtitle">17 ventures pitched. Three take the podium.</p>
+  <p class="reveal__stats">17 teams &middot; 4 weeks &middot; 1 showcase</p>
+  <p class="placeholder-warning">&#9888; Placeholder podium for testing. These are NOT the real winners yet.</p>
+
+  <div class="podium" id="podium">
+    <div class="podium__slot" data-place="3" id="slot-3">
+      <div class="podium__card" id="card-3">
+        <div class="podium__locked">
+          <span class="podium__lock">&#128274;</span>
+          <span class="podium__rank-badge">3rd</span>
+        </div>
+        <div class="podium__revealed" hidden>
+          <p class="podium__track" id="track-3"></p>
+          <h2 id="title-3"></h2>
+          <p class="podium__students" id="students-3"></p>
+          <p class="podium__prize"><span class="podium__prize-icon">&#127942;</span><span class="podium__prize-text"><strong class="podium__prize-amount">$500</strong><span class="podium__prize-desc">10,000 vibecoding credits on SparkEd CodeBox</span></span></p>
+          <p class="podium__blurb" id="blurb-3"></p>
+          <button class="podium__watch-btn" data-place="3">&#9654; Watch pitch</button>
+          <button class="podium__save-btn" data-place="3">&#128190; Save</button>
+        </div>
+      </div>
+      <div class="podium__pedestal podium__pedestal--3"><span>3</span></div>
+    </div>
+
+    <div class="podium__slot podium__slot--first" data-place="1" id="slot-1">
+      <div class="podium__card podium__card--first" id="card-1">
+        <div class="podium__locked">
+          <span class="podium__lock">&#128274;</span>
+          <span class="podium__rank-badge">1st</span>
+        </div>
+        <div class="podium__revealed" hidden>
+          <p class="podium__track" id="track-1"></p>
+          <h2 id="title-1"></h2>
+          <p class="podium__students" id="students-1"></p>
+          <p class="podium__prize podium__prize--first"><span class="podium__prize-icon">&#127942;</span><span class="podium__prize-text"><strong class="podium__prize-amount">$3,000</strong><span class="podium__prize-desc">10,000 vibecoding credits on SparkEd CodeBox</span></span></p>
+          <p class="podium__blurb" id="blurb-1"></p>
+          <button class="podium__watch-btn" data-place="1">&#9654; Watch pitch</button>
+          <button class="podium__save-btn" data-place="1">&#128190; Save</button>
+        </div>
+      </div>
+      <div class="podium__pedestal podium__pedestal--1"><span>1</span></div>
+    </div>
+
+    <div class="podium__slot" data-place="2" id="slot-2">
+      <div class="podium__card" id="card-2">
+        <div class="podium__locked">
+          <span class="podium__lock">&#128274;</span>
+          <span class="podium__rank-badge">2nd</span>
+        </div>
+        <div class="podium__revealed" hidden>
+          <p class="podium__track" id="track-2"></p>
+          <h2 id="title-2"></h2>
+          <p class="podium__students" id="students-2"></p>
+          <p class="podium__prize"><span class="podium__prize-icon">&#127942;</span><span class="podium__prize-text"><strong class="podium__prize-amount">$1,500</strong><span class="podium__prize-desc">10,000 vibecoding credits on SparkEd CodeBox</span></span></p>
+          <p class="podium__blurb" id="blurb-2"></p>
+          <button class="podium__watch-btn" data-place="2">&#9654; Watch pitch</button>
+          <button class="podium__save-btn" data-place="2">&#128190; Save</button>
+        </div>
+      </div>
+      <div class="podium__pedestal podium__pedestal--2"><span>2</span></div>
+    </div>
+  </div>
+
+  <p id="finaleCaption" class="finale-caption" hidden>Global AI Venture Studio &middot; Class of 2026</p>
+
+  <div class="reveal__action">
+    <button id="revealBtn" class="reveal-btn">Reveal 3rd Place</button>
+    <a id="enterHallBtn" class="reveal-btn reveal-btn--ghost" href="hall.html" hidden>Explore all 17 projects &rarr;</a>
+  </div>
+
+  <button id="resetRevealBtn" class="reveal-reset-link">&#8635; Reset reveal</button>
+
+  <div class="credit-footnote">
+    <img src="assets/img/eos-logo.png" alt="Elite Open School" class="credit-footnote__logo">
+    <p>Every participant earns academic credit. All students who completed the course receive a half-semester elective credit through Elite Open School: recognized coursework from an accredited private school.</p>
+  </div>
+
+  <p class="thank-you-note">With thanks to every mentor, parent, and student who made this showcase possible.</p>
+</main>
+
+<div id="watchOverlay" class="watch-overlay" hidden></div>
+<div id="watchModal" class="watch-modal" hidden aria-hidden="true">
+  <button id="watchClose" class="watch-modal__close" aria-label="Close">&#10005;</button>
+  <div class="watch-modal__body">
+    <h3 id="watchTitle"></h3>
+    <div class="watch-media">
+      <div class="watch-media__frame">
+        <video id="watchVideo" controls preload="metadata"></video>
+        <iframe id="watchVideoFrame" title="Pitch video" allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer" allowfullscreen hidden></iframe>
+        <div id="watchVideoPlaceholder" class="media-placeholder" hidden>Video not yet uploaded</div>
+      </div>
+      <a id="watchVideoExternalLink" class="deck-open-link" style="margin-top:10px;" target="_blank" rel="noopener" hidden>&#127909; Watch video externally &#8599;</a>
+    </div>
+    <div id="watchAskWrap" class="watch-detail" hidden>
+      <h4 class="watch-detail__label">The ask</h4>
+      <p class="watch-detail__text" id="watchAsk"></p>
+    </div>
+    <div id="watchCommitmentWrap" class="watch-detail" hidden>
+      <h4 class="watch-detail__label">Founder commitment</h4>
+      <p class="watch-detail__text" id="watchCommitment"></p>
+    </div>
+    <a id="watchDeckLink" class="deck-open-link" target="_blank" rel="noopener">&#128196; Open pitch deck &#8599;</a>
+    <a id="watchPrototypeLink" class="deck-open-link" target="_blank" rel="noopener">&#128295; Try the prototype &#8599;</a>
+  </div>
+</div>
+
+<script src="data/winners.js?v=5"></script>
+<script src="vendor/three-0.160.0.min.js"></script>
+<script src="vendor/gsap-3.12.5.min.js"></script>
+<script src="vendor/confetti-1.9.2.min.js"></script>
+<script src="gate.js?v=3" data-scripts="safeurl.js?v=1,sfx.js?v=1,awards.js?v=24"></script>
+<script src="present.js?v=1"></script>
+</body>
+</html>
