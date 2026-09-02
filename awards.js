@@ -1,6 +1,21 @@
 (function () {
   "use strict";
 
+  var FLAG_BY_COUNTRY = {
+    "Indonesia": "\uD83C\uDDEE\uD83C\uDDE9",
+    "Vietnam": "\uD83C\uDDFB\uD83C\uDDF3",
+    "United States": "\uD83C\uDDFA\uD83C\uDDF8",
+    "China": "\uD83C\uDDE8\uD83C\uDDF3",
+    "Japan": "\uD83C\uDDEF\uD83C\uDDF5",
+  };
+  function studentsWithFlags(project) {
+    var countries = project.countries || [];
+    return project.students.map(function (name, i) {
+      var flag = FLAG_BY_COUNTRY[countries[i]] || "";
+      return flag ? name + " " + flag : name;
+    }).join(", ");
+  }
+
   // ===========================================================================
   // MOTION PREFERENCES
   // ===========================================================================
@@ -299,7 +314,7 @@
       trackEl.hidden = true;
     }
     document.getElementById("title-" + place).textContent = project.title;
-    document.getElementById("students-" + place).textContent = project.students.join(", ");
+    document.getElementById("students-" + place).textContent = studentsWithFlags(project);
     document.getElementById("blurb-" + place).textContent = project.blurb;
   }
 

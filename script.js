@@ -17,6 +17,24 @@
 
   var ACCENT_COLORS = [0x37788a, 0xdfa63e, 0x8e2e4d];
 
+  var FLAG_BY_COUNTRY = {
+    "Indonesia": "\uD83C\uDDEE\uD83C\uDDE9",
+    "Vietnam": "\uD83C\uDDFB\uD83C\uDDF3",
+    "United States": "\uD83C\uDDFA\uD83C\uDDF8",
+    "China": "\uD83C\uDDE8\uD83C\uDDF3",
+    "Japan": "\uD83C\uDDEF\uD83C\uDDF5",
+  };
+
+  // "Chaerin Lee 🇻🇳, Onie Namkung 🇻🇳" style — each name paired with its own
+  // country flag so mixed-country teams (e.g. EyeSpy E-bikes) show correctly.
+  function studentsWithFlags(project) {
+    var countries = project.countries || [];
+    return project.students.map(function (name, i) {
+      var flag = FLAG_BY_COUNTRY[countries[i]] || "";
+      return flag ? name + " " + flag : name;
+    }).join(", ");
+  }
+
   function boothPosition(index) {
     var pair = Math.floor(index / 2);
     var side = index % 2 === 0 ? -1 : 1; // even index -> left, odd -> right
@@ -730,7 +748,7 @@
     scene.add(top);
     clickableMeshes.push(top);
 
-    var texture = makeLabelTexture(project.id, project.title, project.students.join(", "), { accent: "#" + ("000000" + color.toString(16)).slice(-6), thumb: project.thumb });
+    var texture = makeLabelTexture(project.id, project.title, studentsWithFlags(project), { accent: "#" + ("000000" + color.toString(16)).slice(-6), thumb: project.thumb });
     var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
     var sprite = new THREE.Sprite(spriteMat);
     sprite.scale.set(2.56, 1.6, 1);
@@ -821,7 +839,7 @@
       shadowBlob.position.set(spec.x, 0.015, podiumZ);
       scene.add(shadowBlob);
 
-      var texture = makeLabelTexture(spec.label, project.title, project.students.join(", "), { accent: "#" + ("000000" + spec.color.toString(16)).slice(-6), thumb: project.thumb });
+      var texture = makeLabelTexture(spec.label, project.title, studentsWithFlags(project), { accent: "#" + ("000000" + spec.color.toString(16)).slice(-6), thumb: project.thumb });
       var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
       var sprite = new THREE.Sprite(spriteMat);
       sprite.scale.set(2.56, 1.6, 1);
@@ -1299,7 +1317,7 @@
 
     panelBoothId.textContent = "Booth " + project.id;
     panelTitle.textContent = project.title;
-    panelStudents.textContent = project.students.join(", ");
+    panelStudents.textContent = studentsWithFlags(project);
     panelBlurb.textContent = project.blurb;
 
     var hasDeck = !!project.deckSrc;

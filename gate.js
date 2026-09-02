@@ -173,7 +173,7 @@
   var payload = null;
   function fetchPayload() {
     if (payload) return Promise.resolve(payload);
-    return fetch("data/projects.enc.json").then(function (r) { return r.json(); })
+    return fetch("data/projects.enc.json?v=2").then(function (r) { return r.json(); })
       .then(function (p) { payload = p; return p; });
   }
 
