@@ -261,6 +261,33 @@ body { overflow: hidden; height: 100vh; }
   letter-spacing: -0.01em;
 }
 
+/* Keep the podium shape independent of summary length. First place is always
+   the tallest point, while long summaries remain available in the project
+   modal after a concise preview here. */
+@media (min-width: 761px) {
+  .podium__card {
+    height: 470px;
+    box-sizing: border-box;
+    align-items: stretch;
+  }
+  .podium__card--first { height: 500px; }
+  .podium__revealed {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .podium__blurb {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 8;
+    overflow: hidden;
+  }
+  .podium__watch-btn {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    FINALE — the three cards drawn into a tighter family portrait
 --------------------------------------------------------------------------- */
@@ -451,6 +478,8 @@ body { overflow: hidden; height: 100vh; }
 @media (max-width: 760px) {
   .podium { flex-direction: column; align-items: center; }
   .podium__slot, .podium__slot--first { width: 100%; max-width: 360px; }
+  .podium__card, .podium__card--first { height: auto; }
+  .podium__blurb { display: block; overflow: visible; }
   .podium__pedestal { display: none; }
   .podium__slot--first { order: -1; }
 }
