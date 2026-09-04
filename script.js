@@ -27,12 +27,44 @@
 
   // "Chaerin Lee 🇻🇳, Onie Namkung 🇻🇳" style — each name paired with its own
   // country flag so mixed-country teams (e.g. EyeSpy E-bikes) show correctly.
+  // Used for regular DOM text (panel, podium, list) where the browser renders
+  // emoji flags natively and correctly.
   function studentsWithFlags(project) {
     var countries = project.countries || [];
     return project.students.map(function (name, i) {
       var flag = FLAG_BY_COUNTRY[countries[i]] || "";
       return flag ? name + " " + flag : name;
     }).join(", ");
+  }
+
+  // Canvas 2D's fillText() does NOT reliably render flag emoji (regional
+  // indicator ligatures) even in browsers that render them fine in normal
+  // HTML text — on Windows this shows the raw two-letter code ("VN", "US")
+  // instead of a flag. So the 3D hallway labels (drawn to <canvas>, unlike
+  // the DOM-based panel/podium/list views) use real flag *images* instead.
+  var FLAG_ICON_URL = {
+    "Indonesia": "https://flagcdn.com/48x36/id.png",
+    "Vietnam": "https://flagcdn.com/48x36/vn.png",
+    "United States": "https://flagcdn.com/48x36/us.png",
+    "China": "https://flagcdn.com/48x36/cn.png",
+    "Japan": "https://flagcdn.com/48x36/jp.png",
+  };
+  var flagImageCache = {};   // country -> loaded Image
+  var flagLoadWaiters = {};  // country -> [callback] queued while loading
+  function withFlagImage(country, onReady) {
+    if (!FLAG_ICON_URL[country]) return;
+    if (flagImageCache[country]) { onReady(flagImageCache[country]); return; }
+    if (flagLoadWaiters[country]) { flagLoadWaiters[country].push(onReady); return; }
+    flagLoadWaiters[country] = [onReady];
+    var img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = function () {
+      flagImageCache[country] = img;
+      flagLoadWaiters[country].forEach(function (fn) { fn(img); });
+      flagLoadWaiters[country] = null;
+    };
+    img.onerror = function () { flagLoadWaiters[country] = null; };
+    img.src = FLAG_ICON_URL[country];
   }
 
   function boothPosition(index) {
@@ -49,7 +81,7 @@
   // CANVAS TEXT LABEL (booth number + title, drawn to a canvas texture)
   // ===========================================================================
   // Floating booth card: badge pill, big venture title, gold rule, names.
-  function makeLabelTexture(idText, titleText, studentsText, opts) {
+  function makeLabelTexture(idText, titleText, studentsText, opts, countries) {
     var canvas = document.createElement("canvas");
     canvas.width = 640;
     canvas.height = 400;
@@ -110,10 +142,12 @@
     ctx.fillStyle = "#DFA63E";
     ctx.fillRect(320 - 36, 266, 72, 5);
 
+    var nameLineCount = 1;
     if (studentsText) {
       ctx.fillStyle = "#3E4C55";
       ctx.font = "600 27px 'IBM Plex Mono', monospace";
       var nameLines = splitLines(ctx, studentsText, 552);
+      nameLineCount = nameLines.length;
       var ny = nameLines.length > 1 ? 308 : 320;
       nameLines.slice(0, 2).forEach(function (l, i) {
         ctx.fillText(l, 320, ny + i * 34);
@@ -123,6 +157,31 @@
     var texture = new THREE.CanvasTexture(canvas);
     texture.anisotropy = 8;
     texture.needsUpdate = true;
+
+    // draw a small row of real flag images below the names (not emoji text —
+    // canvas fillText mishandles flag ligatures on some platforms, see note
+    // above withFlagImage). Deduplicated, in order of first appearance.
+    var uniqueCountries = [];
+    (countries || []).forEach(function (c) {
+      if (c && uniqueCountries.indexOf(c) === -1) uniqueCountries.push(c);
+    });
+    if (uniqueCountries.length) {
+      var flagW = 34, flagH = 25, gap = 8;
+      var totalW = uniqueCountries.length * flagW + (uniqueCountries.length - 1) * gap;
+      var startX = 320 - totalW / 2;
+      var flagY = (nameLineCount > 1 ? 308 + 34 : 320) + 14;
+      uniqueCountries.forEach(function (country, i) {
+        var fx = startX + i * (flagW + gap);
+        withFlagImage(country, function (img) {
+          ctx.drawImage(img, fx, flagY, flagW, flagH);
+          ctx.strokeStyle = "#E8E2D4";
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(fx, flagY, flagW, flagH);
+          texture.needsUpdate = true;
+        });
+      });
+    }
+
     return texture;
   }
 
@@ -748,7 +807,7 @@
     scene.add(top);
     clickableMeshes.push(top);
 
-    var texture = makeLabelTexture(project.id, project.title, studentsWithFlags(project), { accent: "#" + ("000000" + color.toString(16)).slice(-6), thumb: project.thumb });
+    var texture = makeLabelTexture(project.id, project.title, project.students.join(", "), { accent: "#" + ("000000" + color.toString(16)).slice(-6), thumb: project.thumb }, project.countries);
     var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
     var sprite = new THREE.Sprite(spriteMat);
     sprite.scale.set(2.56, 1.6, 1);
@@ -839,7 +898,7 @@
       shadowBlob.position.set(spec.x, 0.015, podiumZ);
       scene.add(shadowBlob);
 
-      var texture = makeLabelTexture(spec.label, project.title, studentsWithFlags(project), { accent: "#" + ("000000" + spec.color.toString(16)).slice(-6), thumb: project.thumb });
+      var texture = makeLabelTexture(spec.label, project.title, project.students.join(", "), { accent: "#" + ("000000" + spec.color.toString(16)).slice(-6), thumb: project.thumb }, project.countries);
       var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
       var sprite = new THREE.Sprite(spriteMat);
       sprite.scale.set(2.56, 1.6, 1);

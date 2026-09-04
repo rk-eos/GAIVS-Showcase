@@ -6,7 +6,7 @@
 // ---------------------------------------------------------------------------
 
 const WINNERS = [
-  { place: 1, projectId: "01" },
-  { place: 2, projectId: "06" },
-  { place: 3, projectId: "11" },
+  { place: 1, projectId: "06" },
+  { place: 2, projectId: "02" },
+  { place: 3, projectId: "17" },
 ];

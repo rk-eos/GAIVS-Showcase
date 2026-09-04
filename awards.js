@@ -608,6 +608,17 @@
       { opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: "power2.out", delay: 0.15 });
     gsap.fromTo(".credit-footnote", { opacity: 0, y: 12 },
       { opacity: 0.55, y: 0, duration: 0.6, ease: "power2.out", delay: 0.5 });
+
+    var honorableMentionEl = document.getElementById("honorableMention");
+    if (honorableMentionEl && typeof PROJECTS !== "undefined") {
+      var hmProject = PROJECTS.find(function (p) { return p.id === "16"; });
+      if (hmProject) {
+        honorableMentionEl.textContent = "\uD83C\uDF96\uFE0F Honorable mention: " + hmProject.title + " by " + hmProject.students.join(", ");
+        gsap.fromTo(honorableMentionEl, { opacity: 0, y: 10 },
+          { opacity: 0.75, y: 0, duration: 0.6, ease: "power2.out", delay: 0.65 });
+      }
+    }
+
     updateActionUI();
   });
 
