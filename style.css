@@ -1,6 +1,6 @@
 @import url("brand.css");
 
-body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+body { overflow: hidden; height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
 
 .back-link {
   display: inline-block;
@@ -334,14 +334,45 @@ body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
    RESPONSIVE
 --------------------------------------------------------------------------- */
 @media (max-width: 720px) {
-  .hall-header { align-items: flex-start; }
+  .hall-header,
+  .hall-header--compact { align-items: flex-start; gap: 10px; padding: 14px 4vw 12px; }
+  .back-link { margin-bottom: 4px; font-size: 11px; }
+  .eyebrow { font-size: 10px; margin-bottom: 4px; }
+  .hall-header h1 { font-size: clamp(26px, 9vw, 34px); }
+  .subtitle { font-size: 13px; line-height: 1.35; margin-top: 6px; max-width: none; }
+  .hall-note { font-size: 10px; line-height: 1.35; margin-top: 5px; }
   .hall-header__controls { align-items: flex-start; width: 100%; }
-  .search-wrap input { width: 100%; max-width: none; }
+  .search-wrap { width: 100%; }
+  .search-wrap input { width: 100%; max-width: none; min-height: 42px; }
   .panel { width: 100vw; }
+  .panel__nav { padding: 14px 50px 12px 14px; gap: 6px; }
+  .panel__nav-btn { min-height: 40px; padding: 6px 10px; }
+  .panel__booth-id { font-size: 10px; }
+  .panel__body { padding: 20px 18px 32px; }
+  .panel__body h2 { font-size: 28px; }
+  .panel__blurb { font-size: 15px; margin-bottom: 22px; }
+  .panel__close { top: 13px; right: 8px; }
   .squiggle { display: none; }
-  .hallway-wrap { padding: 0 4vw 20px; }
-  .hallway-progress-wrap { left: 4vw; right: 4vw; bottom: 58px; }
+  .hallway-wrap { padding: 0 0 74px; }
+  #hallwayCanvas { border-radius: 0; }
+  .hallway-hint { top: 10px; width: calc(100% - 28px); box-sizing: border-box; padding: 7px 10px; font-size: 10.5px; text-align: center; }
+  .hallway-progress-wrap { left: 16px; right: 16px; bottom: 64px; }
   .hallway-progress-label { display: none; }
+  .hallway-controls { bottom: 13px; gap: 10px; width: 100%; justify-content: center; }
+  .walk-btn { width: 44px; height: 44px; }
+  .hallway-counter { min-width: 112px; font-size: 10.5px; }
+  .freewalk-hint { bottom: 70px; max-width: calc(100vw - 28px); white-space: normal; text-align: center; }
+}
+
+@media (max-width: 420px) {
+  .subtitle { display: none; }
+  .hall-note { margin-top: 3px; }
+  .panel__nav { flex-wrap: wrap; justify-content: center; padding-right: 44px; }
+  .panel__booth-id { order: -1; width: 100%; text-align: center; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .walk-btn--wasd { display: none; }
 }
 
 /* external-video CTA: the video lives on another site, make the link the hero */

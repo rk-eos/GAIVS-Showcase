@@ -299,9 +299,23 @@
   var sequence = [3, 2, 1];
   var stepIndex = 0;
   var revealedProjectByPlace = {};
+  var honorableMentionEl = document.getElementById("honorableMention");
+  var honorableMentionProject = projectById["16"];
 
   var revealBtn = document.getElementById("revealBtn");
   var enterHallBtn = document.getElementById("enterHallBtn");
+
+  if (honorableMentionEl && honorableMentionProject) {
+    honorableMentionEl.textContent = "\uD83C\uDF96\uFE0F Honorable mention: " +
+      honorableMentionProject.title + " by " + honorableMentionProject.students.join(", ");
+  }
+
+  function revealHonorableMention() {
+    if (!honorableMentionEl || !honorableMentionProject) return;
+    honorableMentionEl.hidden = false;
+    gsap.fromTo(honorableMentionEl, { opacity: 0, y: 10 },
+      { opacity: 0.75, y: 0, duration: 0.6, ease: "power2.out" });
+  }
 
   function populateCard(place, project) {
     var track = trackByCode[project.track] || null;
@@ -539,6 +553,7 @@
     revealPlace(place, function () {
       revealing = false;
       revealBtn.disabled = false;
+      if (place === 3) revealHonorableMention();
       stepIndex++;
       gsap.to(revealBtn, { opacity: 1, duration: dur(0.4) });
       updateActionUI();
@@ -584,6 +599,12 @@
       bonusRevealed.hidden = true;
     }
 
+    if (honorableMentionEl) {
+      gsap.killTweensOf(honorableMentionEl);
+      gsap.set(honorableMentionEl, { opacity: 0, y: 10 });
+      honorableMentionEl.hidden = true;
+    }
+
     enterHallBtn.hidden = true;
     revealBtn.hidden = false;
     revealBtn.disabled = false;
@@ -608,16 +629,6 @@
       { opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: "power2.out", delay: 0.15 });
     gsap.fromTo(".credit-footnote", { opacity: 0, y: 12 },
       { opacity: 0.55, y: 0, duration: 0.6, ease: "power2.out", delay: 0.5 });
-
-    var honorableMentionEl = document.getElementById("honorableMention");
-    if (honorableMentionEl && typeof PROJECTS !== "undefined") {
-      var hmProject = PROJECTS.find(function (p) { return p.id === "16"; });
-      if (hmProject) {
-        honorableMentionEl.textContent = "\uD83C\uDF96\uFE0F Honorable mention: " + hmProject.title + " by " + hmProject.students.join(", ");
-        gsap.fromTo(honorableMentionEl, { opacity: 0, y: 10 },
-          { opacity: 0.75, y: 0, duration: 0.6, ease: "power2.out", delay: 0.65 });
-      }
-    }
 
     updateActionUI();
   });

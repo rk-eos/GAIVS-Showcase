@@ -37,34 +37,39 @@
     }).join(", ");
   }
 
-  // Canvas 2D's fillText() does NOT reliably render flag emoji (regional
-  // indicator ligatures) even in browsers that render them fine in normal
-  // HTML text — on Windows this shows the raw two-letter code ("VN", "US")
-  // instead of a flag. So the 3D hallway labels (drawn to <canvas>, unlike
-  // the DOM-based panel/podium/list views) use real flag *images* instead.
-  var FLAG_ICON_URL = {
-    "Indonesia": "https://flagcdn.com/48x36/id.png",
-    "Vietnam": "https://flagcdn.com/48x36/vn.png",
-    "United States": "https://flagcdn.com/48x36/us.png",
-    "China": "https://flagcdn.com/48x36/cn.png",
-    "Japan": "https://flagcdn.com/48x36/jp.png",
-  };
-  var flagImageCache = {};   // country -> loaded Image
-  var flagLoadWaiters = {};  // country -> [callback] queued while loading
-  function withFlagImage(country, onReady) {
-    if (!FLAG_ICON_URL[country]) return;
-    if (flagImageCache[country]) { onReady(flagImageCache[country]); return; }
-    if (flagLoadWaiters[country]) { flagLoadWaiters[country].push(onReady); return; }
-    flagLoadWaiters[country] = [onReady];
-    var img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = function () {
-      flagImageCache[country] = img;
-      flagLoadWaiters[country].forEach(function (fn) { fn(img); });
-      flagLoadWaiters[country] = null;
-    };
-    img.onerror = function () { flagLoadWaiters[country] = null; };
-    img.src = FLAG_ICON_URL[country];
+  // Canvas does not reliably combine regional-indicator emoji into flags on
+  // Windows. Draw them locally so they stay crisp, offline, and CSP-safe.
+  function drawFlagIcon(ctx, country, x, y, w, h) {
+    ctx.save();
+    roundRect(ctx, x, y, w, h, 3);
+    ctx.clip();
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(x, y, w, h);
+    if (country === "Indonesia") {
+      ctx.fillStyle = "#CE1126"; ctx.fillRect(x, y, w, h / 2);
+    } else if (country === "Vietnam") {
+      ctx.fillStyle = "#DA251D"; ctx.fillRect(x, y, w, h);
+      drawStar(ctx, x + w / 2, y + h / 2, h * 0.28, h * 0.12, 5, "#FFDF00");
+    } else if (country === "United States") {
+      for (var s = 0; s < 7; s++) {
+        ctx.fillStyle = "#B22234"; ctx.fillRect(x, y + s * h / 7, w, h / 14);
+      }
+      ctx.fillStyle = "#3C3B6E"; ctx.fillRect(x, y, w * 0.45, h * 0.55);
+      ctx.fillStyle = "#FFFFFF";
+      for (var sy = 0; sy < 3; sy++) for (var sx = 0; sx < 4; sx++) {
+        ctx.beginPath(); ctx.arc(x + 4 + sx * 6, y + 4 + sy * 5, 1.1, 0, Math.PI * 2); ctx.fill();
+      }
+    } else if (country === "China") {
+      ctx.fillStyle = "#DE2910"; ctx.fillRect(x, y, w, h);
+      drawStar(ctx, x + w * 0.25, y + h * 0.32, h * 0.22, h * 0.09, 5, "#FFDE00");
+    } else if (country === "Japan") {
+      ctx.fillStyle = "#BC002D"; ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, h * 0.28, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+    ctx.strokeStyle = "rgba(38,51,59,0.18)";
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, x, y, w, h, 3);
+    ctx.stroke();
   }
 
   function boothPosition(index) {
@@ -78,10 +83,147 @@
   }
 
   // ===========================================================================
-  // CANVAS TEXT LABEL (booth number + title, drawn to a canvas texture)
+  // CANVAS TITLE CARD (project-aware vector art + booth information)
   // ===========================================================================
-  // Floating booth card: badge pill, big venture title, gold rule, names.
+  var ART_THEMES = [
+    { key: "fashion", label: "STYLE + SHARE", match: /stylist|fashion|wardrobe|outfit|clothing|beauty|wear/ },
+    { key: "refill", label: "REFILL + REUSE", match: /refill|reusable|packaging|bottle|single.use|zero.waste/ },
+    { key: "water", label: "WATER WATCH", match: /aqua|water|flood|drain|leak|ocean|marine|hydration/ },
+    { key: "air", label: "CLEAN AIR", match: /air|pollution|emission|breath|carbon/ },
+    { key: "fire", label: "FIRE SAFETY", match: /fire|flame|smoke|wildfire|emergency/ },
+    { key: "prosthetic", label: "HUMAN TECH", match: /prosthetic|limb|bioeng|surger|amput|arm/ },
+    { key: "access", label: "ACCESS FOR ALL", match: /accessib|sign language|hearing|deaf|mute|blind|vision/ },
+    { key: "crossing", label: "SAFER STREETS", match: /crossing|cross the road|road safety|pedestrian/ },
+    { key: "park", label: "PLAY OUTSIDE", match: /park|playground|play near|safe space to play/ },
+    { key: "mobility", label: "MOVE BETTER", match: /bike|e-bike|ride|mobility|transport|transit|commute|route|vehicle|traffic/ },
+    { key: "queue", label: "FAIR + FAST", match: /lineup|lunch line|queue|cut in line/ },
+    { key: "finance", label: "HEALTHY CHOICES", match: /gambl|finance|money|budget|invest|saving|spend|bank/ },
+    { key: "health", label: "WELLBEING", match: /health|mental|wellness|medical|therapy|care|fitness|sleep|stress/ },
+    { key: "career", label: "OPEN DOORS", match: /career|job|resume|work|hire|employ|talent|intern/ },
+    { key: "connect", label: "CONNECT", match: /link|connect|network|community|social|together|matching/ }
+  ];
+
+  function pickArtTheme(project) {
+    var source = [project.title, project.blurb, project.ask, project.commitment]
+      .filter(Boolean).join(" ").toLowerCase();
+    for (var i = 0; i < ART_THEMES.length; i++) {
+      if (ART_THEMES[i].match.test(source)) return ART_THEMES[i];
+    }
+    return { key: "spark", label: "AI VENTURE" };
+  }
+
+  function drawStar(ctx, cx, cy, outer, inner, points, fill) {
+    ctx.save(); ctx.beginPath();
+    for (var i = 0; i < points * 2; i++) {
+      var r = i % 2 ? inner : outer;
+      var a = -Math.PI / 2 + i * Math.PI / points;
+      if (!i) ctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+      else ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+    }
+    ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.restore();
+  }
+
+  function drawProjectArt(ctx, project, accent, x, y, w, h) {
+    var theme = pickArtTheme(project);
+    var cx = x + w / 2, cy = y + h / 2;
+    ctx.save();
+    roundRect(ctx, x, y, w, h, 22); ctx.clip();
+    var bg = ctx.createLinearGradient(x, y, x + w, y + h);
+    bg.addColorStop(0, accent); bg.addColorStop(1, "#26333B");
+    ctx.fillStyle = bg; ctx.fillRect(x, y, w, h);
+    ctx.globalAlpha = 0.15; ctx.strokeStyle = "#FFFFFF"; ctx.lineWidth = 2;
+    for (var g = -h; g < w + h; g += 34) {
+      ctx.beginPath(); ctx.moveTo(x + g, y); ctx.lineTo(x + g + h, y + h); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "rgba(255,255,255,0.12)";
+    ctx.beginPath(); ctx.arc(x + w * 0.75, y + h * 0.18, w * 0.58, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#FFFFFF"; ctx.fillStyle = "#FFFFFF";
+    ctx.lineWidth = 9; ctx.lineCap = "round"; ctx.lineJoin = "round";
+
+    if (theme.key === "fashion") {
+      ctx.beginPath(); ctx.arc(cx, cy - 58, 18, Math.PI, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, cy - 40); ctx.lineTo(cx - 58, cy + 22); ctx.lineTo(cx + 58, cy + 22); ctx.closePath(); ctx.stroke();
+      drawStar(ctx, cx + 58, cy - 52, 15, 6, 4, "#F2C75C");
+    } else if (theme.key === "water") {
+      ctx.beginPath(); ctx.moveTo(cx, cy - 82); ctx.bezierCurveTo(cx - 58, cy - 10, cx - 48, cy + 48, cx, cy + 56); ctx.bezierCurveTo(cx + 48, cy + 48, cx + 58, cy - 10, cx, cy - 82); ctx.stroke();
+      ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(cx - 10, cy + 10, 22, 0.1, 1.6); ctx.stroke();
+    } else if (theme.key === "refill") {
+      ctx.strokeRect(cx - 28, cy - 44, 56, 90); ctx.fillRect(cx - 16, cy - 62, 32, 18);
+      ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(cx, cy + 2, 70, -1.15, 1.1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + 66, cy + 30); ctx.lineTo(cx + 66, cy + 2); ctx.lineTo(cx + 42, cy + 18); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy + 2, 70, 1.95, 4.1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - 58, cy - 38); ctx.lineTo(cx - 66, cy - 10); ctx.lineTo(cx - 40, cy - 20); ctx.stroke();
+    } else if (theme.key === "air") {
+      ctx.lineWidth = 8;
+      [-38, 0, 38].forEach(function (dy, i) {
+        ctx.beginPath(); ctx.moveTo(cx - 66, cy + dy);
+        ctx.bezierCurveTo(cx - 10, cy + dy - 28, cx + 8, cy + dy + 28, cx + 62 - i * 10, cy + dy); ctx.stroke();
+      });
+      ctx.fillStyle = "#F2C75C"; ctx.beginPath(); ctx.ellipse(cx + 52, cy - 60, 15, 28, 0.65, 0, Math.PI * 2); ctx.fill();
+    } else if (theme.key === "fire") {
+      ctx.beginPath(); ctx.moveTo(cx, cy + 66); ctx.bezierCurveTo(cx - 72, cy + 22, cx - 18, cy - 10, cx - 28, cy - 76); ctx.bezierCurveTo(cx + 42, cy - 30, cx + 78, cy + 22, cx, cy + 66); ctx.stroke();
+      ctx.fillStyle = "#F2C75C"; ctx.beginPath(); ctx.moveTo(cx, cy + 36); ctx.bezierCurveTo(cx - 24, cy + 8, cx + 4, cy - 4, cx + 2, cy - 34); ctx.bezierCurveTo(cx + 32, cy - 4, cx + 28, cy + 24, cx, cy + 36); ctx.fill();
+    } else if (theme.key === "mobility") {
+      ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(cx - 48, cy + 34, 34, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx + 52, cy + 34, 34, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - 48, cy + 34); ctx.lineTo(cx - 8, cy - 24); ctx.lineTo(cx + 18, cy + 34); ctx.lineTo(cx - 48, cy + 34); ctx.moveTo(cx - 8, cy - 24); ctx.lineTo(cx + 42, cy - 24); ctx.lineTo(cx + 52, cy + 34); ctx.stroke();
+    } else if (theme.key === "park") {
+      ctx.fillStyle = "#F2C75C"; ctx.beginPath(); ctx.arc(cx - 28, cy - 32, 42, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + 28, cy - 18, 46, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#FFFFFF"; ctx.fillRect(cx - 9, cy - 14, 18, 78);
+      ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(cx - 70, cy + 64); ctx.quadraticCurveTo(cx, cy + 34, cx + 70, cy + 64); ctx.stroke();
+    } else if (theme.key === "crossing") {
+      ctx.fillStyle = "#FFFFFF";
+      [-62, -20, 22].forEach(function (dx) { ctx.save(); ctx.translate(cx + dx, cy); ctx.rotate(-0.22); ctx.fillRect(-10, -70, 20, 140); ctx.restore(); });
+      ctx.fillStyle = "#F2C75C"; ctx.beginPath(); ctx.arc(cx + 54, cy - 50, 17, 0, Math.PI * 2); ctx.fill();
+    } else if (theme.key === "queue") {
+      [-52, 0, 52].forEach(function (dx, i) {
+        ctx.beginPath(); ctx.arc(cx + dx, cy - 30 + i * 8, 17, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx + dx, cy - 10 + i * 8); ctx.lineTo(cx + dx, cy + 48 + i * 8); ctx.stroke();
+      });
+      ctx.strokeStyle = "#F2C75C"; ctx.beginPath(); ctx.moveTo(cx - 70, cy + 72); ctx.lineTo(cx + 72, cy + 72); ctx.stroke();
+    } else if (theme.key === "access") {
+      ctx.beginPath(); ctx.ellipse(cx, cy, 76, 48, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = "#F2C75C"; ctx.beginPath(); ctx.arc(cx, cy, 24, 0, Math.PI * 2); ctx.fill();
+      drawStar(ctx, cx + 66, cy - 62, 14, 6, 4, "#FFFFFF");
+    } else if (theme.key === "prosthetic") {
+      ctx.lineWidth = 11; ctx.beginPath(); ctx.moveTo(cx - 28, cy - 74); ctx.lineTo(cx - 10, cy - 12); ctx.lineTo(cx + 22, cy + 20); ctx.lineTo(cx + 10, cy + 74); ctx.stroke();
+      ctx.lineWidth = 6; [-1, 0, 1].forEach(function (n) { ctx.beginPath(); ctx.arc(cx - 28 + n * 24, cy - 70 + Math.abs(n) * 10, 10, 0, Math.PI * 2); ctx.stroke(); });
+      drawStar(ctx, cx + 56, cy - 30, 15, 6, 4, "#F2C75C");
+    } else if (theme.key === "health") {
+      ctx.beginPath(); ctx.moveTo(cx, cy + 60); ctx.bezierCurveTo(cx - 95, cy + 6, cx - 64, cy - 66, cx - 18, cy - 44); ctx.bezierCurveTo(cx, cy - 84, cx + 84, cy - 62, cx + 72, cy - 4); ctx.bezierCurveTo(cx + 66, cy + 24, cx + 34, cy + 46, cx, cy + 60); ctx.stroke();
+      ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(cx - 42, cy + 2); ctx.lineTo(cx - 16, cy + 2); ctx.lineTo(cx - 2, cy - 20); ctx.lineTo(cx + 16, cy + 20); ctx.lineTo(cx + 30, cy + 2); ctx.lineTo(cx + 48, cy + 2); ctx.stroke();
+    } else if (theme.key === "career") {
+      roundRect(ctx, cx - 70, cy - 34, 140, 92, 12); ctx.stroke(); ctx.strokeRect(cx - 26, cy - 56, 52, 24);
+      ctx.beginPath(); ctx.moveTo(cx - 68, cy); ctx.lineTo(cx + 68, cy); ctx.stroke();
+    } else if (theme.key === "finance") {
+      ctx.fillStyle = "#FFFFFF"; ctx.fillRect(cx - 66, cy + 18, 26, 46); ctx.fillRect(cx - 22, cy - 14, 26, 78); ctx.fillRect(cx + 22, cy - 54, 26, 118);
+      ctx.strokeStyle = "#F2C75C"; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(cx - 68, cy - 28); ctx.lineTo(cx - 18, cy - 52); ctx.lineTo(cx + 14, cy - 38); ctx.lineTo(cx + 64, cy - 82); ctx.stroke();
+    } else {
+      var nodes = [[-58,-32],[0,-62],[58,-28],[-48,42],[12,22],[60,58]];
+      ctx.lineWidth = 6; ctx.globalAlpha = 0.8;
+      [[0,1],[1,2],[0,3],[1,4],[2,4],[3,4],[4,5],[2,5]].forEach(function (p) {
+        ctx.beginPath(); ctx.moveTo(cx + nodes[p[0]][0], cy + nodes[p[0]][1]); ctx.lineTo(cx + nodes[p[1]][0], cy + nodes[p[1]][1]); ctx.stroke();
+      });
+      ctx.globalAlpha = 1; nodes.forEach(function (n, i) {
+        ctx.fillStyle = i === 4 ? "#F2C75C" : "#FFFFFF"; ctx.beginPath(); ctx.arc(cx + n[0], cy + n[1], i === 4 ? 14 : 10, 0, Math.PI * 2); ctx.fill();
+      });
+    }
+
+    ctx.fillStyle = "rgba(255,255,255,0.88)";
+    ctx.font = "600 15px 'IBM Plex Mono', monospace";
+    ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+    ctx.fillText(theme.label, cx, y + h - 17);
+    ctx.restore();
+  }
+
+  // Artwork is selected from each project's decrypted title and description
+  // at runtime; protected project data is never copied into source.
   function makeLabelTexture(idText, titleText, studentsText, opts, countries) {
+    opts = opts || {};
+    var project = opts.project || { title: titleText };
+    var accent = opts.accent || "#DFA63E";
     var canvas = document.createElement("canvas");
     canvas.width = 640;
     canvas.height = 400;
@@ -96,9 +238,9 @@
     ctx.fill();
     ctx.restore();
 
-    var sheen = ctx.createLinearGradient(0, 18, 0, 362);
+    var sheen = ctx.createLinearGradient(24, 18, 616, 362);
     sheen.addColorStop(0, "#FFFFFF");
-    sheen.addColorStop(1, "#FBF7EE");
+    sheen.addColorStop(1, "#F7F2E8");
     ctx.fillStyle = sheen;
     roundRect(ctx, 24, 18, 592, 344, 30);
     ctx.fill();
@@ -107,81 +249,74 @@
     roundRect(ctx, 24, 18, 592, 344, 30);
     ctx.stroke();
 
-    // accent bar across the top edge in the booth's own color
+    // accent bar and the project-aware vector illustration
     ctx.save();
     roundRect(ctx, 24, 18, 592, 344, 30);
     ctx.clip();
-    ctx.fillStyle = (opts && opts.accent) || "#DFA63E";
-    ctx.fillRect(24, 18, 592, 14);
+    ctx.fillStyle = accent;
+    ctx.fillRect(24, 18, 592, 12);
     ctx.restore();
+    drawProjectArt(ctx, project, accent, 424, 34, 176, 312);
 
     var badge = /^\d+$/.test(idText) ? "BOOTH " + idText : idText + " PLACE";
-    ctx.font = "600 24px 'IBM Plex Mono', monospace";
+    ctx.font = "600 21px 'IBM Plex Mono', monospace";
     var bw = ctx.measureText(badge).width + 44;
     ctx.fillStyle = "#DFA63E";
-    roundRect(ctx, (640 - bw) / 2, 58, bw, 44, 22);
+    roundRect(ctx, 58, 54, bw, 42, 21);
     ctx.fill();
     ctx.fillStyle = "#FFFFFF";
-    ctx.textAlign = "center";
+    ctx.textAlign = "left";
     ctx.textBaseline = "middle";
-    ctx.fillText(badge, 320, 81);
+    ctx.fillText(badge, 80, 76);
 
     ctx.textBaseline = "alphabetic";
     ctx.fillStyle = "#26333B";
-    ctx.font = "700 52px 'Space Grotesk', sans-serif";
-    var titleLines = splitLines(ctx, titleText, 552);
+    ctx.font = "700 46px 'Space Grotesk', sans-serif";
+    var titleLines = splitLines(ctx, titleText, 334);
     if (titleLines.length > 1) {
-      ctx.font = "700 44px 'Space Grotesk', sans-serif";
-      titleLines = splitLines(ctx, titleText, 552);
+      ctx.font = "700 38px 'Space Grotesk', sans-serif";
+      titleLines = splitLines(ctx, titleText, 334);
     }
-    var ty = titleLines.length > 1 ? 168 : 188;
+    if (titleLines.length > 2) {
+      ctx.font = "700 33px 'Space Grotesk', sans-serif";
+      titleLines = splitLines(ctx, titleText, 334);
+    }
+    var ty = titleLines.length > 1 ? 154 : 178;
     titleLines.slice(0, 2).forEach(function (l, i) {
-      ctx.fillText(l, 320, ty + i * 52);
+      ctx.fillText(l, 62, ty + i * 45);
     });
 
     ctx.fillStyle = "#DFA63E";
-    ctx.fillRect(320 - 36, 266, 72, 5);
+    ctx.fillRect(62, 250, 62, 5);
 
-    var nameLineCount = 1;
     if (studentsText) {
       ctx.fillStyle = "#3E4C55";
-      ctx.font = "600 27px 'IBM Plex Mono', monospace";
-      var nameLines = splitLines(ctx, studentsText, 552);
-      nameLineCount = nameLines.length;
-      var ny = nameLines.length > 1 ? 308 : 320;
+      ctx.font = "600 21px 'IBM Plex Mono', monospace";
+      var nameLines = splitLines(ctx, studentsText, 334);
+      var ny = nameLines.length > 1 ? 286 : 302;
       nameLines.slice(0, 2).forEach(function (l, i) {
-        ctx.fillText(l, 320, ny + i * 34);
+        ctx.fillText(l, 62, ny + i * 28);
+      });
+    }
+
+    // locally drawn flags avoid cross-origin requests and emoji shaping issues
+    var uniqueCountries = [];
+    (countries || []).forEach(function (c) {
+      if (c && uniqueCountries.indexOf(c) === -1) uniqueCountries.push(c);
+    });
+    if (uniqueCountries.length) {
+      var flagW = 30, flagH = 21, gap = 7;
+      var startX = 62;
+      var flagY = 326;
+      uniqueCountries.forEach(function (country, i) {
+        var fx = startX + i * (flagW + gap);
+        drawFlagIcon(ctx, country, fx, flagY, flagW, flagH);
       });
     }
 
     var texture = new THREE.CanvasTexture(canvas);
     texture.anisotropy = 8;
     texture.needsUpdate = true;
-
-    // draw a small row of real flag images below the names (not emoji text —
-    // canvas fillText mishandles flag ligatures on some platforms, see note
-    // above withFlagImage). Deduplicated, in order of first appearance.
-    var uniqueCountries = [];
-    (countries || []).forEach(function (c) {
-      if (c && uniqueCountries.indexOf(c) === -1) uniqueCountries.push(c);
-    });
-    if (uniqueCountries.length) {
-      var flagW = 34, flagH = 25, gap = 8;
-      var totalW = uniqueCountries.length * flagW + (uniqueCountries.length - 1) * gap;
-      var startX = 320 - totalW / 2;
-      var flagY = (nameLineCount > 1 ? 308 + 34 : 320) + 14;
-      uniqueCountries.forEach(function (country, i) {
-        var fx = startX + i * (flagW + gap);
-        withFlagImage(country, function (img) {
-          ctx.drawImage(img, fx, flagY, flagW, flagH);
-          ctx.strokeStyle = "#E8E2D4";
-          ctx.lineWidth = 1.5;
-          ctx.strokeRect(fx, flagY, flagW, flagH);
-          texture.needsUpdate = true;
-        });
-      });
-    }
-
     return texture;
   }
 
@@ -476,8 +611,10 @@
   function resize() {
     var w = wrap.clientWidth, h = wrap.clientHeight;
     renderer.setSize(w, h, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    var isPhone = w < 720;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isPhone ? 1.5 : 2));
     camera.aspect = w / h;
+    camera.fov = camera.aspect < 0.8 ? 76 : (camera.aspect < 1.15 ? 68 : 62);
     camera.updateProjectionMatrix();
   }
   window.addEventListener("resize", resize);
@@ -807,7 +944,7 @@
     scene.add(top);
     clickableMeshes.push(top);
 
-    var texture = makeLabelTexture(project.id, project.title, project.students.join(", "), { accent: "#" + ("000000" + color.toString(16)).slice(-6), thumb: project.thumb }, project.countries);
+    var texture = makeLabelTexture(project.id, project.title, project.students.join(", "), { accent: "#" + ("000000" + color.toString(16)).slice(-6), project: project }, project.countries);
     var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
     var sprite = new THREE.Sprite(spriteMat);
     sprite.scale.set(2.56, 1.6, 1);
@@ -869,8 +1006,8 @@
     var podiumZ = END_WALL_Z + 2.5;
     var specByPlace = {
       1: { x: 0, height: 1.3, color: 0xdfa63e, label: "1ST" },
-      2: { x: -1.9, height: 0.9, color: 0x37788a, label: "2ND" },
-      3: { x: 1.9, height: 0.7, color: 0x8e2e4d, label: "3RD" },
+      2: { x: -2.9, height: 0.9, color: 0x37788a, label: "2ND" },
+      3: { x: 2.9, height: 0.7, color: 0x8e2e4d, label: "3RD" },
     };
 
     WINNERS.forEach(function (winner) {
@@ -898,7 +1035,7 @@
       shadowBlob.position.set(spec.x, 0.015, podiumZ);
       scene.add(shadowBlob);
 
-      var texture = makeLabelTexture(spec.label, project.title, project.students.join(", "), { accent: "#" + ("000000" + spec.color.toString(16)).slice(-6), thumb: project.thumb }, project.countries);
+      var texture = makeLabelTexture(spec.label, project.title, project.students.join(", "), { accent: "#" + ("000000" + spec.color.toString(16)).slice(-6), project: project }, project.countries);
       var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
       var sprite = new THREE.Sprite(spriteMat);
       sprite.scale.set(2.56, 1.6, 1);
