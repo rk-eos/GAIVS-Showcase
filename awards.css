@@ -183,23 +183,6 @@ body { overflow: hidden; height: 100vh; }
 .podium__revealed { width: 100%; text-align: left; }
 .podium__revealed[hidden] { display: none !important; }
 
-/* A project-specific mini poster stays visible on every winner card. */
-.podium__art {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
-  filter: drop-shadow(0 8px 14px rgba(38,51,59,0.16));
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transform: scale(0.82);
-}
-.podium__revealed h2,
-.podium__students,
-.podium__track { padding-right: 80px; }
 .podium__track {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -305,12 +288,6 @@ body { overflow: hidden; height: 100vh; }
   .podium__watch-btn {
     margin-top: auto;
     align-self: flex-start;
-  }
-  .podium__card.is-revealed .podium__art {
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1);
-    transition: opacity 0.4s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
 
