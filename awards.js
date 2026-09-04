@@ -493,7 +493,10 @@
     tl.call(function () { cueWhoosh(); })
       .to(locked, { opacity: 0, scale: 0.8, duration: dur(0.22), ease: "power1.in" })
       .set(locked, { display: "none" })
-      .call(function () { revealed.hidden = false; })
+      .call(function () {
+        revealed.hidden = false;
+        card.classList.add("is-revealed");
+      })
       .fromTo(revealed, { opacity: 0, y: 14, scale: 0.92 },
         { opacity: 1, y: 0, scale: 1, duration: dur(0.55), ease: "back.out(1.6)" });
 
@@ -585,6 +588,7 @@
       gsap.set(locked, { display: "", opacity: 1, scale: 1 });
       gsap.set(revealed, { opacity: 0, y: 14, scale: 0.92 });
       revealed.hidden = true;
+      card.classList.remove("is-revealed");
       card.style.boxShadow = "";
       resetPrize(place);
     });
