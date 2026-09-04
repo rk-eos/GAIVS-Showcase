@@ -211,10 +211,6 @@
       });
     }
 
-    ctx.fillStyle = "rgba(255,255,255,0.88)";
-    ctx.font = "600 15px 'IBM Plex Mono', monospace";
-    ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-    ctx.fillText(theme.label, cx, y + h - 17);
     ctx.restore();
   }
 
@@ -449,6 +445,7 @@
     1: { face: "#F2C75C", edge: "#A9751B", ink: "#5A3D08", ribbon: "#8E2E4D", numeral: "1" },
     2: { face: "#D9DEE2", edge: "#8B959C", ink: "#3F484E", ribbon: "#37788A", numeral: "2" },
     3: { face: "#D89A63", edge: "#8E5C2E", ink: "#4A2C10", ribbon: "#5F4632", numeral: "3" },
+    hm: { face: "#F4F0E6", edge: "#DFA63E", ink: "#8E2E4D", ribbon: "#37788A", numeral: "HM", font: "700 48px 'Space Grotesk', sans-serif" },
   };
   var medalTextureCache = {};
 
@@ -492,7 +489,7 @@
     ctx.fillStyle = spec.face; ctx.fill();
 
     ctx.fillStyle = spec.ink;
-    ctx.font = "700 74px 'Space Grotesk', sans-serif";
+    ctx.font = spec.font || "700 74px 'Space Grotesk', sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(spec.numeral, 128, 162);
@@ -907,6 +904,7 @@
 
   var WINNER_EMISSIVE = 0xdfa63e;
   var WINNER_EMISSIVE_INTENSITY = 0.34;
+  var HONORABLE_MENTION_PROJECT_ID = "16";
   var MEDAL_BOB = 0.11;
   var PLAQUE_SIZE = 0.42;
 
@@ -915,6 +913,7 @@
     var color = ACCENT_COLORS[index % ACCENT_COLORS.length];
     var side = index % 2 === 0 ? -1 : 1;   // -1 = left of the aisle
     var place = placeByProjectId[project.id];
+    var isHonorableMention = project.id === HONORABLE_MENTION_PROJECT_ID;
 
     var shadowBlob = new THREE.Mesh(
       new THREE.CircleGeometry(0.95, 24),
@@ -989,6 +988,30 @@
 
       addSpotlight(pos.x, pos.z);
       winnerStops.push({ z: pos.z, place: place });
+    } else if (isHonorableMention) {
+      // SmartLink receives a distinct rosette, teal glow, and tour pause without
+      // presenting it as a numbered podium placement.
+      [base, top].forEach(function (m) {
+        addGoldRim(m, 1.09);
+        m.userData.restEmissive = 0x37788a;
+        m.userData.restIntensity = 0.3;
+        m.material.emissive.setHex(0x37788a);
+        m.material.emissiveIntensity = 0.3;
+      });
+
+      var honorableMat = new THREE.SpriteMaterial({ map: makeMedalTexture("hm"), transparent: true, alphaTest: 0.5, depthWrite: false });
+      honorableMat.fog = false;
+      var honorableMedal = new THREE.Sprite(honorableMat);
+      honorableMedal.scale.set(0.78, 0.78, 1);
+      var honorableY = 3.72;
+      honorableMedal.position.set(pos.x, honorableY, pos.z);
+      honorableMedal.userData.baseY = honorableY;
+      honorableMedal.userData.phase = 4.4;
+      scene.add(honorableMedal);
+      medalSprites.push(honorableMedal);
+
+      addSpotlight(pos.x, pos.z);
+      winnerStops.push({ z: pos.z, place: "hm" });
     }
 
     project.__meshes = [base, top];
